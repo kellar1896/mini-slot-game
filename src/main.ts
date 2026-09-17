@@ -1,60 +1,67 @@
-import './style.css'
-import heroImg from './assets/hero.png'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import { setupCounter } from './counter.ts'
+import { slotConfig } from './core/config/slot.config';
+import { SlotGame } from './core/game/slotGame';
+import './style.css';
+import { GameApplication } from './ui/app/GameApplication';
+import { SlotLayout } from './ui/slot/SlotLayout';
+import { SlotScaler } from './ui/slot/SlotScaler';
+import { SlotView } from './ui/slot/SlotView';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
 
-<div class="ticks"></div>
+const container = document.querySelector<HTMLDivElement>('#app');
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+if (!container) {
+  throw new Error('Application container not found');
+}
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+const app = new GameApplication();
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+await app.init(container);
+
+const game = new SlotGame(slotConfig);
+
+const slotView = new SlotView(
+  slotConfig.reels,
+  slotConfig.rows,
+  240,
+  10,
+);
+
+app.stage.addChild(slotView);
+
+const layout = new SlotLayout(
+  slotView,
+);
+
+const scaler = new SlotScaler({
+  min: 0.6,
+  max: 1.2,
+  referenceWidth: 1280,
+});
+
+const updateLayout = (): void => {
+  const scale = scaler.calculate(
+    app.screen.width,
+  );
+
+  slotView.scale.set(scale);
+
+  layout.center(
+    app.screen.width,
+    app.screen.height,
+  );
+};
+
+updateLayout();
+
+const result = game.spin();
+
+slotView.setResult(
+  result.reels,
+);
+
+window.addEventListener(
+  'resize',
+  updateLayout,
+);
+
+(globalThis as typeof globalThis & { __PIXI_APP__: GameApplication }).__PIXI_APP__ = app;
