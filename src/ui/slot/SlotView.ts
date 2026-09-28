@@ -1,6 +1,7 @@
 import { Container } from 'pixi.js';
 import type { SymbolId } from '../../types/game';
 import { ReelView } from '../reel/ReelView';
+import { SymbolFactory } from '../symbol/SymbolFactory';
 
 export class SlotView extends Container {
   label = 'SlotView';
@@ -19,6 +20,11 @@ export class SlotView extends Container {
     this._symbolSize = symbolSize;
     this._gap = gap;
 
+    const symbolFactory =
+      new SymbolFactory({
+        symbolSize,
+      });
+
     for (
       let index = 0;
       index < columns;
@@ -28,6 +34,7 @@ export class SlotView extends Container {
         rows,
         symbolSize,
         gap,
+        symbolFactory
       );
 
       reel.x = index * (
