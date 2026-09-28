@@ -1,4 +1,5 @@
 import { slotConfig } from './core/config/slot.config';
+import { SlotController } from './core/game/slotController.ts';
 import { SlotGame } from './core/game/slotGame.ts';
 import './style.css';
 import { GameApplication } from './ui/app/GameApplication';
@@ -53,11 +54,20 @@ const updateLayout = (): void => {
 
 updateLayout();
 
-const result = game.spin();
 
-slotView.setResult(
-  result.reels,
-);
+const controller =
+  new SlotController(
+    game,
+    slotView,
+  );
+
+controller.spin();
+
+// const result = game.spin();
+
+// slotView.setResult(
+//   result.reels,
+// );
 
 window.addEventListener(
   'resize',
