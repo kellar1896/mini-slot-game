@@ -3,7 +3,7 @@ import type { SlotConfig } from "../../types/game";
 
 export const slotConfig: SlotConfig = {
   rows: 3,
-  reels: 3,
+  reels: 5,
 
   symbols: [
     {
@@ -38,11 +38,19 @@ export const slotConfig: SlotConfig = {
     {
       symbols: ['Q', 'J', 'A', 'K', '10', 'Q', 'A', 'J'],
     },
+    {
+      symbols: ['Q', 'J', 'A', 'K', '10', 'Q', 'A', 'J'],
+    },
+    {
+      symbols: ['Q', 'J', 'A', 'K', '10', 'Q', 'A', 'J'],
+    }
   ],
 
   defaultReels: [
     ['A', 'K', 'Q'],
     ['K', 'Q', 'A'],
     ['Q', 'J', 'A'],
+    ['J', '10', 'K'],
+    ['10', 'A', 'Q']
   ],
 };
