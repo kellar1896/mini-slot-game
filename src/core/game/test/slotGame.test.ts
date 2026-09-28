@@ -8,7 +8,7 @@ describe('SlotGame', () => {
 
     const result = game.spin();
 
-    expect(result.reels).toHaveLength(3);
+    expect(result.reels).toHaveLength(5);
   });
 
   it('generates the correct number of rows', () => {
