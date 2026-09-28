@@ -1,6 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
 import type { SymbolId } from '../../types/game';
-import { SymbolView } from '../symbol/SybolView';
+import { SymbolView } from '../symbol/SymbolView';
+import type { SymbolFactory } from '../symbol/SymbolFactory';
 
 export class ReelView extends Container {
   private readonly _symbols: SymbolView[] = [];
@@ -13,6 +14,7 @@ export class ReelView extends Container {
     rows: number,
     symbolSize: number,
     gap: number,
+    symbolFactory: SymbolFactory,
   ) {
     super();
 
@@ -20,10 +22,7 @@ export class ReelView extends Container {
     this._gap = gap;
 
     for (let index = 0; index < rows; index++) {
-      const symbol = new SymbolView(
-        'A',
-        symbolSize,
-      );
+      const symbol = symbolFactory.create('A');
 
       symbol.y = index * (symbolSize + gap);
 

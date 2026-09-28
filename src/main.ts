@@ -1,5 +1,5 @@
 import { slotConfig } from './core/config/slot.config';
-import { SlotGame } from './core/game/slotGame';
+import { SlotGame } from './core/game/slotGame.ts';
 import './style.css';
 import { GameApplication } from './ui/app/GameApplication';
 import { SlotLayout } from './ui/slot/SlotLayout';

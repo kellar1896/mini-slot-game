@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SlotGame } from './slotGame';
+import { SlotGame } from './SlotGame';
 import { slotConfig } from '../config/slot.config';
 
 describe('SlotGame', () => {
