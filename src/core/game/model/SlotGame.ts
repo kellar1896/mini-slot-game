@@ -1,4 +1,4 @@
-import type { SlotConfig, SpinResult, SymbolId } from "../../types/game";
+import type { SlotConfig, SpinResult, SymbolId } from "../../../types/game";
 
 export class SlotGame {
   private readonly config: SlotConfig;

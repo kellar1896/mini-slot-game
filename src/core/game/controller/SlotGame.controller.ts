@@ -1,7 +1,7 @@
 import { createActor } from "xstate";
-import type { SlotView } from "../../ui/slot/SlotView";
-import type { SlotGame } from "./slotGame";
-import { slotMachine } from "../state-machine/slot-machine.state";
+import { SlotView } from "../../../ui/slot/SlotView";
+import { SlotGame } from "../model/SlotGame";
+import { slotMachine } from "../../state-machine/slot-machine.state";
 
 export class SlotController {
     private readonly actor;

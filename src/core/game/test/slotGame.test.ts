@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { SlotGame } from './SlotGame';
-import { slotConfig } from '../config/slot.config';
+import { slotConfig } from '../../config/slot.config';
+import { SlotGame } from '../model/SlotGame';
 
 describe('SlotGame', () => {
   it('generates the correct number of reels', () => {

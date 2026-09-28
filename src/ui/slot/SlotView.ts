@@ -7,8 +7,8 @@ export class SlotView extends Container {
   label = 'SlotView';
   private readonly _reels: ReelView[] = [];
 
-  private readonly _symbolSize: number;
-  private readonly _gap: number;
+  // private readonly _symbolSize: number;
+  // private readonly _gap: number;
 
   constructor(
     columns: number,
@@ -17,8 +17,9 @@ export class SlotView extends Container {
     gap: number,
   ) {
     super();
-    this._symbolSize = symbolSize;
-    this._gap = gap;
+    // this._symbolSize = symbolSize;
+    // this._gap = gap;
+
 
     const symbolFactory =
       new SymbolFactory({
