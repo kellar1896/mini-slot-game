@@ -77,8 +77,7 @@ new SpinInput(
   eventBus,
 );
 
-const controller =
-  new SlotController(
+new SlotController(
     game,
     slotView,
     eventBus
