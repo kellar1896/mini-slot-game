@@ -2,18 +2,23 @@ import { createActor } from "xstate";
 import { SlotView } from "../../../ui/slot/SlotView";
 import { SlotGame } from "../model/SlotGame";
 import { slotMachine } from "../../state-machine/slot-machine.state";
+import type { GameEventBus } from '../../events/GameEventBus';
 
 export class SlotController {
-    private readonly actor;
+    private readonly actor: ReturnType<typeof createActor>;
 
     private readonly _game: SlotGame;
     private readonly _view: SlotView;
+    private readonly _eventBus: GameEventBus;
+
     constructor(
         game: SlotGame,
-        view: SlotView
+        view: SlotView,
+        eventBus: GameEventBus
     ) {
         this._game = game;
         this._view = view;
+        this._eventBus = eventBus;
         this.actor = createActor(
             slotMachine,
         );
