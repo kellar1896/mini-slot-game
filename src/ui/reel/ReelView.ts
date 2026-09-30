@@ -34,6 +34,7 @@ export class ReelView extends Container {
   private _stopStartY = 0;
 
   private _stopResult: SymbolId[] | null = null;
+  private _stopResolve: (() => void) | null = null;
 
   constructor(
     config: ReelViewConfig,
@@ -194,7 +195,7 @@ export class ReelView extends Container {
 
   stop(
     result: SymbolId[],
-  ): void {
+  ): Promise<void> {
     if (
       !this._spinning ||
       this._stopping
@@ -203,7 +204,7 @@ export class ReelView extends Container {
         result,
       );
 
-      return;
+      return Promise.resolve();
     }
 
     this._stopping = true;
@@ -215,6 +216,10 @@ export class ReelView extends Container {
 
     this._stopResult =
       result;
+
+    return new Promise((resolve) => {
+      this._stopResolve = resolve;
+    });
   }
 
   private updateSpin(
@@ -307,6 +312,9 @@ export class ReelView extends Container {
     this.positionSymbols();
 
     this._stopResult = null;
+
+    this._stopResolve?.();
+    this._stopResolve = null;
   }
 
   private recycleFirstSymbol(): void {

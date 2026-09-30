@@ -51,7 +51,7 @@ export class SlotController {
                 });
     }
 
-    spin(): void {
+    async spin(): Promise<void> {
         if (
             this.actor.getSnapshot().value !==
             'idle'
@@ -66,9 +66,9 @@ export class SlotController {
         const result =
             this._game.spin();
 
-        this._view.setResult(
-            result.reels,
-        );
+        this._view.startSpin();
+
+        await this._view.stop(result.reels);
 
         this.actor.send({
             type: 'REELS_STOPPED',

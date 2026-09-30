@@ -63,8 +63,8 @@ export class SlotView extends Container {
 
   stop(
     result: SymbolId[][],
-  ): void {
-    result.forEach(
+  ): Promise<void> {
+    const stopPromises = result.map(
       (
         reelResult,
         reelIndex,
@@ -75,14 +75,16 @@ export class SlotView extends Container {
           ];
 
         if (!reel) {
-          return;
+          return Promise.resolve();
         }
 
-        reel.stop(
+        return reel.stop(
           reelResult,
         );
       },
     );
+
+    return Promise.all(stopPromises).then(() => undefined);
   }
 
   setResult(result: SymbolId[][]): void {
