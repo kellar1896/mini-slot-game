@@ -11,8 +11,13 @@ export class ReelView extends Container {
   private readonly _symbolSize: number;
   private readonly _gap: number;
   private readonly _step: number;
-
+  private readonly _reelStrip: SymbolId[];
   private readonly _visibleRows: number;
+
+  private _stripIndex = 0;
+  private _spinning = false;
+
+  private readonly _spinSpeed = 35;
 
   constructor(
     config: ReelViewConfig,
@@ -24,6 +29,7 @@ export class ReelView extends Container {
       rows,
       symbolSize,
       gap,
+      reelStrip,
     } = config;
 
     if (initialSymbols.length !== rows) {
@@ -35,8 +41,12 @@ export class ReelView extends Container {
 
     this._symbolSize = symbolSize;
     this._gap = gap;
+    this._reelStrip = reelStrip;
     this._step = symbolSize + gap;
     this._visibleRows = initialSymbols.length;
+
+    this._step =
+      symbolSize + gap;
 
     this._symbolContainer = new Container();
     this.addChild(this._symbolContainer);
@@ -148,5 +158,9 @@ export class ReelView extends Container {
       this._symbols.length * this._symbolSize +
       (this._symbols.length - 1) * this._gap
     );
+  }
+
+  get reelStrip(): readonly SymbolId[] {
+    return this._reelStrip;
   }
 }
