@@ -219,16 +219,14 @@ export class ReelView extends Container {
       this._symbolContainer.y;
 
     this._stopTravelled = 0;
-    this._stopTargetPosition= targetPosition;
+    this._stopTargetPosition = targetPosition;
     const reelLength = this._reelStrip.length;
 
     const distanceToTarget = (this._stripIndex - targetPosition + reelLength) % reelLength;
     const extraRotations = 1; // Number of extra rotations before stopping wip
     const symbolsToTravel = distanceToTarget + extraRotations * reelLength;
 
-    this._stopDistance =
-      symbolsToTravel *
-      this._step - (this._stopStartY + this._step);
+    this._stopDistance = symbolsToTravel * this._step;
 
     this._stopResult =
       result;
@@ -321,7 +319,8 @@ export class ReelView extends Container {
   private finishStop(): void {
     this._spinning = false;
     this._stopping = false;
-
+    this._symbolContainer.y = 0;
+    
     Ticker.shared.remove(
       this.updateSpin,
       this,
@@ -346,60 +345,60 @@ export class ReelView extends Container {
   }
 
   private recycleLastSymbol(): void {
-  const lastSymbol =
-    this._symbols.pop();
+    const lastSymbol =
+      this._symbols.pop();
 
-  if (!lastSymbol) {
-    return;
-  }
+    if (!lastSymbol) {
+      return;
+    }
 
-  this._stripIndex =
-    (
-      this._stripIndex -
-      1 +
-      this._reelStrip.length
-    ) %
-    this._reelStrip.length;
+    this._stripIndex =
+      (
+        this._stripIndex -
+        1 +
+        this._reelStrip.length
+      ) %
+      this._reelStrip.length;
 
-  const previousSymbol =
-    this._reelStrip[
+    const previousSymbol =
+      this._reelStrip[
       this._stripIndex
-    ];
+      ];
 
-  if (!previousSymbol) {
-    return;
+    if (!previousSymbol) {
+      return;
+    }
+
+    lastSymbol.setSymbol(
+      previousSymbol,
+    );
+
+    this._symbols.forEach(
+      (
+        symbol,
+        index,
+      ) => {
+        symbol.y =
+          index *
+          this._step;
+      },
+    );
+
+    lastSymbol.y = 0;
+
+    this._symbols.unshift(
+      lastSymbol,
+    );
+
+    this._symbolContainer.removeChild(
+      lastSymbol,
+    );
+
+    this._symbolContainer.addChildAt(
+      lastSymbol,
+      0,
+    );
   }
-
-  lastSymbol.setSymbol(
-    previousSymbol,
-  );
-
-  this._symbols.forEach(
-    (
-      symbol,
-      index,
-    ) => {
-      symbol.y =
-        index *
-        this._step;
-    },
-  );
-
-  lastSymbol.y = 0;
-
-  this._symbols.unshift(
-    lastSymbol,
-  );
-
-  this._symbolContainer.removeChild(
-    lastSymbol,
-  );
-
-  this._symbolContainer.addChildAt(
-    lastSymbol,
-    0,
-  );
-}
 
   private recycleFirstSymbol(): void {
     const firstSymbol =
