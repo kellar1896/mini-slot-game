@@ -28,3 +28,11 @@ export interface SpinResult {
   reels: SymbolId[][];
   win: number;
 }
+
+export type ReelViewConfig = {
+  initialSymbols: SymbolId[];
+  reelStrip: SymbolId[];
+  rows: number;
+  symbolSize: number;
+  gap: number;
+};
