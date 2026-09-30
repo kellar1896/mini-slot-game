@@ -32,6 +32,9 @@ export class ReelView extends Container {
 
   private _stopElapsed = 0;
   private _stopStartY = 0;
+  private _stopTravelled = 0;
+  private _stopDistance = 0;
+  private _stopTargetPosition = 0;
 
   private _stopResult: SymbolId[] | null = null;
   private _stopResolve: (() => void) | null = null;
@@ -215,6 +218,18 @@ export class ReelView extends Container {
     this._stopStartY =
       this._symbolContainer.y;
 
+    this._stopTravelled = 0;
+    this._stopTargetPosition= targetPosition;
+    const reelLength = this._reelStrip.length;
+
+    const distanceToTarget = (targetPosition - this._stripIndex + reelLength) % reelLength;
+    const extraRotations = 2; // Number of extra rotations before stopping wip
+    const symbolsToTravel = distanceToTarget + extraRotations * reelLength;
+
+    this._stopDistance =
+      symbolsToTravel *
+      this._step - (this._stopStartY + this._step);
+
     this._stopResult =
       result;
 
@@ -277,9 +292,24 @@ export class ReelView extends Container {
         3,
       );
 
-    this._symbolContainer.y =
-      this._stopStartY *
-      (1 - easedProgress);
+    const targetTravel = this._stopDistance * easedProgress;
+
+    const deltaTravel = targetTravel - this._stopTravelled;
+
+    this._stopTravelled = targetTravel;
+
+    this._symbolContainer.y +=
+      deltaTravel;
+
+    while (
+      this._symbolContainer.y >=
+      this._step
+    ) {
+      this._symbolContainer.y -=
+        this._step;
+
+      this.recycleFirstSymbol();
+    }
 
     if (
       progress >= 1
@@ -303,12 +333,9 @@ export class ReelView extends Container {
       this.update(
         this._stopResult,
       );
-
-      this._stripIndex =
-        this.findInitialStripIndex(
-          this._stopResult,
-        );
     }
+
+    this._stripIndex = this._stopTargetPosition;
 
     this.positionSymbols();
 
