@@ -448,13 +448,16 @@ export class ReelView extends Container {
   private createBufferSymbols(
     visibleSymbols: SymbolId[],
   ): SymbolId[] {
-    const previousSymbol =
-      visibleSymbols[
-      visibleSymbols.length - 1
-      ];
+    const reelLength = this._reelStrip.length;
+    const previousIndex =
+      (this._stripIndex - 1 + reelLength) % reelLength;
+    const nextIndex =
+      (this._stripIndex + visibleSymbols.length) % reelLength;
 
+    const previousSymbol =
+      this._reelStrip[previousIndex];
     const nextSymbol =
-      visibleSymbols[0];
+      this._reelStrip[nextIndex];
 
     return [
       previousSymbol ??
