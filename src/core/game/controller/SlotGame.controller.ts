@@ -65,6 +65,10 @@ export class SlotController {
 
         this._view.startSpin();
 
+        await new Promise((resolve) =>
+            setTimeout(resolve, 2000),
+        );
+
         const result =
             this._game.spin();
 

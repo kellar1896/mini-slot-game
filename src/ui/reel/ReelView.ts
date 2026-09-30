@@ -28,7 +28,7 @@ export class ReelView extends Container {
   private _stopping = false;
 
   private readonly _spinSpeed = 35;
-  private readonly _stopDuration = 300;
+  private readonly _stopDuration = 1000;
 
   private _stopElapsed = 0;
   private _stopStartY = 0;
@@ -223,7 +223,7 @@ export class ReelView extends Container {
     const reelLength = this._reelStrip.length;
 
     const distanceToTarget = (targetPosition - this._stripIndex + reelLength) % reelLength;
-    const extraRotations = 2; // Number of extra rotations before stopping wip
+    const extraRotations = 1; // Number of extra rotations before stopping wip
     const symbolsToTravel = distanceToTarget + extraRotations * reelLength;
 
     this._stopDistance =
