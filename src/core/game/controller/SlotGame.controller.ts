@@ -82,6 +82,10 @@ export class SlotController {
             this.actor.send({
                 type: 'WIN_DETECTED',
             });
+
+            this.actor.send({
+                type: 'WIN_COMPLETED',
+            });
         } else {
             this.actor.send({
                 type: 'NO_WIN',
