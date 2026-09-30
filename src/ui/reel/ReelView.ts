@@ -31,7 +31,6 @@ export class ReelView extends Container {
   private readonly _stopDuration = 1000;
 
   private _stopElapsed = 0;
-  private _stopStartY = 0;
   private _stopTravelled = 0;
   private _stopDistance = 0;
   private _stopTargetPosition = 0;
@@ -200,6 +199,16 @@ export class ReelView extends Container {
     result: SymbolId[],
     targetPosition: number
   ): Promise<void> {
+    if(
+      targetPosition < 0 ||
+      targetPosition >= this._reelStrip.length
+    ) {
+      throw new Error(
+        `Invalid target position: ${targetPosition}. ` +
+        `It must be between 0 and ${this._reelStrip.length - 1}.`,
+      );
+    }
+
     if (
       !this._spinning ||
       this._stopping
@@ -214,9 +223,6 @@ export class ReelView extends Container {
     this._stopping = true;
 
     this._stopElapsed = 0;
-
-    this._stopStartY =
-      this._symbolContainer.y;
 
     this._stopTravelled = 0;
     this._stopTargetPosition = targetPosition;
@@ -319,7 +325,6 @@ export class ReelView extends Container {
   private finishStop(): void {
     this._spinning = false;
     this._stopping = false;
-    this._symbolContainer.y = 0;
     
     Ticker.shared.remove(
       this.updateSpin,
