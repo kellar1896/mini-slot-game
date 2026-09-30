@@ -1,5 +1,14 @@
-import { Container, Graphics, Ticker } from 'pixi.js';
-import type { ReelViewConfig, SymbolId } from '../../types/game';
+import {
+  Container,
+  Graphics,
+  Ticker,
+} from 'pixi.js';
+
+import type {
+  ReelViewConfig,
+  SymbolId,
+} from '../../types/game';
+
 import { SymbolView } from '../symbol/SymbolView';
 import type { SymbolFactory } from '../symbol/SymbolFactory';
 
@@ -31,6 +40,7 @@ export class ReelView extends Container {
     symbolFactory: SymbolFactory,
   ) {
     super();
+
     const {
       initialSymbols,
       rows,
@@ -39,18 +49,21 @@ export class ReelView extends Container {
       reelStrip,
     } = config;
 
-    if (initialSymbols.length !== rows) {
+    if (
+      initialSymbols.length !== rows
+    ) {
       throw new Error(
-        `Initial symbols length (${initialSymbols.length}) 
-        does not match the number of rows (${rows}).`,
+        `Initial symbols length (${initialSymbols.length}) ` +
+        `does not match the number of rows (${rows}).`,
       );
     }
 
     this._reelStrip = reelStrip;
 
-    this._visibleRows = initialSymbols.length;
+    this._visibleRows = rows;
 
     this._symbolSize = symbolSize;
+
     this._gap = gap;
 
     this._step = symbolSize + gap;
@@ -61,15 +74,15 @@ export class ReelView extends Container {
       this._symbolContainer,
     );
 
-    this.createSymbols(
-      initialSymbols,
-      symbolFactory,
-    );
-
     this._stripIndex =
       this.findInitialStripIndex(
         initialSymbols,
       );
+
+    this.createSymbols(
+      initialSymbols,
+      symbolFactory,
+    );
 
     this._maskGraphics =
       new Graphics();
@@ -114,19 +127,19 @@ export class ReelView extends Container {
     symbols: SymbolId[],
     symbolFactory: SymbolFactory,
   ): void {
-    symbols.forEach(
+    const symbolsWithBuffer =
+      this.createBufferSymbols(
+        symbols,
+      );
+
+    symbolsWithBuffer.forEach(
       (
         symbol,
-        index,
       ) => {
         const symbolView =
           symbolFactory.create(
             symbol,
           );
-
-        symbolView.y =
-          index *
-          this._step;
 
         this._symbols.push(
           symbolView,
@@ -139,16 +152,28 @@ export class ReelView extends Container {
     );
   }
 
-  update(symbols: SymbolId[]): void {
-    symbols.forEach((symbol, index) => {
-      const symbolView = this._symbols[index];
+  update(
+    symbols: SymbolId[],
+  ): void {
+    symbols.forEach(
+      (
+        symbol,
+        index,
+      ) => {
+        const symbolView =
+          this._symbols[
+          index + 1
+          ];
 
-      if (!symbolView) {
-        return;
-      }
+        if (!symbolView) {
+          return;
+        }
 
-      symbolView.setSymbol(symbol);
-    });
+        symbolView.setSymbol(
+          symbol,
+        );
+      },
+    );
   }
 
   startSpin(): void {
@@ -182,7 +207,9 @@ export class ReelView extends Container {
     }
 
     this._stopping = true;
+
     this._stopElapsed = 0;
+
     this._stopStartY =
       this._symbolContainer.y;
 
@@ -277,8 +304,6 @@ export class ReelView extends Container {
         );
     }
 
-    // this._symbolContainer.y = 0;
-
     this.positionSymbols();
 
     this._stopResult = null;
@@ -340,9 +365,13 @@ export class ReelView extends Container {
       visibleSymbols[0];
 
     return [
-      previousSymbol ?? this._reelStrip[0],
+      previousSymbol ??
+      this._reelStrip[0],
+
       ...visibleSymbols,
-      nextSymbol ?? this._reelStrip[0],
+
+      nextSymbol ??
+      this._reelStrip[0],
     ].filter(
       (
         symbol,
@@ -387,23 +416,20 @@ export class ReelView extends Container {
       : 0;
   }
 
-  private getHeight(rows: number): number {
+  private getHeight(
+    rows: number,
+  ): number {
     return (
-      rows * this._symbolSize +
-      (rows - 1) * this._gap
+      rows *
+      this._symbolSize +
+      (rows - 1) *
+      this._gap
     );
   }
 
   get width(): number {
     return this._symbolSize;
   }
-
-  // get height(): number {
-  //   return (
-  //     this._symbols.length * this._symbolSize +
-  //     (this._symbols.length - 1) * this._gap
-  //   );
-  // }
 
   get height(): number {
     return this.getHeight(
