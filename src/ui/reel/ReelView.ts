@@ -195,6 +195,7 @@ export class ReelView extends Container {
 
   stop(
     result: SymbolId[],
+    targetPosition: number
   ): Promise<void> {
     if (
       !this._spinning ||
