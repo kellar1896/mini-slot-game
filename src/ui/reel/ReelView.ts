@@ -222,7 +222,7 @@ export class ReelView extends Container {
     this._stopTargetPosition= targetPosition;
     const reelLength = this._reelStrip.length;
 
-    const distanceToTarget = (targetPosition - this._stripIndex + reelLength) % reelLength;
+    const distanceToTarget = (this._stripIndex - targetPosition + reelLength) % reelLength;
     const extraRotations = 1; // Number of extra rotations before stopping wip
     const symbolsToTravel = distanceToTarget + extraRotations * reelLength;
 
@@ -268,7 +268,7 @@ export class ReelView extends Container {
       this._symbolContainer.y -=
         this._step;
 
-      this.recycleFirstSymbol();
+      this.recycleLastSymbol();
     }
   }
 
@@ -308,7 +308,7 @@ export class ReelView extends Container {
       this._symbolContainer.y -=
         this._step;
 
-      this.recycleFirstSymbol();
+      this.recycleLastSymbol();
     }
 
     if (
@@ -344,6 +344,51 @@ export class ReelView extends Container {
     this._stopResolve?.();
     this._stopResolve = null;
   }
+
+  private recycleLastSymbol(): void {
+  const lastSymbol =
+    this._symbols.pop();
+
+  if (!lastSymbol) {
+    return;
+  }
+
+  this._stripIndex =
+    (
+      this._stripIndex -
+      1 +
+      this._reelStrip.length
+    ) %
+    this._reelStrip.length;
+
+  const previousSymbol =
+    this._reelStrip[
+      this._stripIndex
+    ];
+
+  if (!previousSymbol) {
+    return;
+  }
+
+  lastSymbol.setSymbol(
+    previousSymbol,
+  );
+
+  lastSymbol.y = 0;
+
+  this._symbols.unshift(
+    lastSymbol,
+  );
+
+  this._symbolContainer.removeChild(
+    lastSymbol,
+  );
+
+  this._symbolContainer.addChildAt(
+    lastSymbol,
+    0,
+  );
+}
 
   private recycleFirstSymbol(): void {
     const firstSymbol =
