@@ -1,7 +1,8 @@
 import { Container } from 'pixi.js';
-import type { SymbolId } from '../../types/game';
+import type { SlotConfig, SymbolId } from '../../types/game';
 import { ReelView } from '../reel/ReelView';
 import { SymbolFactory } from '../symbol/SymbolFactory';
+import type { AssetManager } from '../../components';
 
 export class SlotView extends Container {
   label = 'SlotView';
@@ -11,28 +12,29 @@ export class SlotView extends Container {
   // private readonly _gap: number;
 
   constructor(
-    columns: number,
-    rows: number,
+    slotConfig: SlotConfig,
     symbolSize: number,
     gap: number,
+    assetManager: AssetManager
   ) {
     super();
     // this._symbolSize = symbolSize;
     // this._gap = gap;
 
 
-    const symbolFactory =
-      new SymbolFactory({
-        symbolSize,
-      });
+    const symbolFactory = new SymbolFactory({
+      symbolSize,
+    },
+      assetManager);
 
     for (
       let index = 0;
-      index < columns;
+      index < slotConfig.reels;
       index++
     ) {
       const reel = new ReelView(
-        rows,
+        slotConfig.defaultReels[index] || [],
+        slotConfig.rows,
         symbolSize,
         gap,
         symbolFactory

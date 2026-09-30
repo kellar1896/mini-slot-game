@@ -1,4 +1,4 @@
-import { SpinButtonView } from './components';
+import { AssetManager, SpinButtonView } from './components';
 import { slotConfig } from './core/config/slot.config';
 import { GameEventBus } from './core/events/GameEventBus';
 import { SpinInput } from './core/events/SpinInput';
@@ -17,16 +17,18 @@ if (!container) {
 }
 
 const app = new GameApplication();
+const assetManager = new AssetManager();
 
 await app.init(container);
+await assetManager.load();
 
 const game = new SlotGame(slotConfig);
 
 const slotView = new SlotView(
-  slotConfig.reels,
-  slotConfig.rows,
+  slotConfig,
   240,
   10,
+  assetManager
 );
 const spinButton = new SpinButtonView();
 

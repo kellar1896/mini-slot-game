@@ -11,6 +11,7 @@ export class ReelView extends Container {
   private readonly _gap: number;
 
   constructor(
+    initialSymbols: SymbolId[],
     rows: number,
     symbolSize: number,
     gap: number,
@@ -21,8 +22,20 @@ export class ReelView extends Container {
     this._symbolSize = symbolSize;
     this._gap = gap;
 
+    if (initialSymbols.length !== rows) {
+      throw new Error(
+        `Initial symbols length (${initialSymbols.length}) does not match the number of rows (${rows}).`,
+      );
+    }
+
     for (let index = 0; index < rows; index++) {
-      const symbol = symbolFactory.create('M1');
+      const initialSymbol = initialSymbols[index];
+
+      if (initialSymbol === undefined) {
+        throw new Error(`Missing initial symbol for row ${index}.`);
+      }
+
+      const symbol = symbolFactory.create(initialSymbol);
 
       symbol.y = index * (symbolSize + gap);
 
