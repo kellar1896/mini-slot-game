@@ -68,7 +68,7 @@ export class SlotController {
         const result =
             this._game.spin();
 
-        await this._view.stop(result.reels);
+        await this._view.stop(result.reels, result.reelPositions);
 
         this.actor.send({
             type: 'REELS_STOPPED',
