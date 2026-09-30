@@ -3,14 +3,43 @@ import type { SymbolId } from "../../types/game";
 
 export class AssetManager {
   async load(): Promise<void> {
-    // TODO: Implement asset loading logic here
+    await Assets.load([
+      {
+        alias: 'M1',
+        src: 'src/assets/symbols/high1.png',
+      },
+      {
+        alias: 'M2',
+        src: 'src/assets/symbols/high2.png',
+      },
+      {
+        alias: 'M3',
+        src: 'src/assets/symbols/high3.png',
+      },
+      {
+        alias: 'F1',
+        src: 'src/assets/symbols/low1.png',
+      },
+      {
+        alias: 'F2',
+        src: 'src/assets/symbols/low2.png',
+      },
+      {
+        alias: 'F3',
+        src: 'src/assets/symbols/low3.png',
+      },
+      {
+        alias: 'F4',
+        src: 'src/assets/symbols/low4.png',
+      },
+    ]);
   }
 
   getSymbolTexture(
     symbol: SymbolId,
   ): Texture {
     const texture = Assets.get(
-      `symbol-${symbol}`,
+      `${symbol}`,
     );
 
     if (!texture) {
