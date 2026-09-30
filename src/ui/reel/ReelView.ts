@@ -22,7 +22,7 @@ export class ReelView extends Container {
     this._gap = gap;
 
     for (let index = 0; index < rows; index++) {
-      const symbol = symbolFactory.create('A');
+      const symbol = symbolFactory.create('M1');
 
       symbol.y = index * (symbolSize + gap);
 

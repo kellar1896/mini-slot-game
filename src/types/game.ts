@@ -1,9 +1,11 @@
 export type SymbolId =
-  | 'A'
-  | 'K'
-  | 'Q'
-  | 'J'
-  | '10';
+  | 'M1'
+  | 'M2'
+  | 'M3'
+  | 'F1'
+  | 'F2'
+  | 'F3'
+  | 'F4';
 
 export interface SymbolConfig {
   id: SymbolId;

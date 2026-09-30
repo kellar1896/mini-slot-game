@@ -7,50 +7,103 @@ export const slotConfig: SlotConfig = {
 
   symbols: [
     {
-      id: 'A',
+      id: 'M1',
       value: 10,
     },
     {
-      id: 'K',
+      id: 'M2',
       value: 8,
     },
     {
-      id: 'Q',
+      id: 'M3',
       value: 6,
     },
     {
-      id: 'J',
+      id: 'F1',
+      value: 5,
+    },
+    {
+      id: 'F2',
       value: 4,
     },
     {
-      id: '10',
+      id: 'F3',
+      value: 3,
+    },
+    {
+      id: 'F4',
       value: 2,
     },
   ],
 
   reelStrips: [
     {
-      symbols: ['A', 'K', 'Q', 'J', '10', 'A', 'K', 'Q'],
+      symbols: [
+        'M1',
+        'M2',
+        'M3',
+        'F1',
+        'F2',
+        'F3',
+        'F4',
+        'M1',
+      ],
     },
     {
-      symbols: ['K', 'Q', 'A', '10', 'J', 'K', 'A', 'Q'],
+      symbols: [
+        'M2',
+        'M3',
+        'F1',
+        'F2',
+        'F3',
+        'F4',
+        'M1',
+        'M2',
+      ],
     },
     {
-      symbols: ['Q', 'J', 'A', 'K', '10', 'Q', 'A', 'J'],
+      symbols: [
+        'M3',
+        'F1',
+        'F2',
+        'F3',
+        'F4',
+        'M1',
+        'M2',
+        'M3',
+      ],
     },
     {
-      symbols: ['Q', 'J', 'A', 'K', '10', 'Q', 'A', 'J'],
+      symbols: [
+        'F1',
+        'F2',
+        'F3',
+        'F4',
+        'M1',
+        'M2',
+        'M3',
+        'F1',
+      ],
     },
     {
-      symbols: ['Q', 'J', 'A', 'K', '10', 'Q', 'A', 'J'],
-    }
+      symbols: [
+        'F2',
+        'F3',
+        'F4',
+        'M1',
+        'M2',
+        'M3',
+        'F1',
+        'F2',
+      ],
+    },
   ],
 
   defaultReels: [
-    ['A', 'K', 'Q'],
-    ['K', 'Q', 'A'],
-    ['Q', 'J', 'A'],
-    ['J', '10', 'K'],
-    ['10', 'A', 'Q']
+    ['M1', 'M2', 'M3'],
+    ['M2', 'M3', 'F1'],
+    ['M3', 'F1', 'F2'],
+    ['F1', 'F2', 'F3'],
+    ['F2', 'F3', 'F4'],
   ],
 };
