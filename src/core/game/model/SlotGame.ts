@@ -8,20 +8,24 @@ export class SlotGame {
   }
 
   spin(): SpinResult {
-    const reels = this.generateResult();
+    const result = this.generateResult();
 
     return {
-      reels,
-      win: this.evaluate(reels),
+      reels: result.reels,
+      win: this.evaluate(result.reels),
+      reelPositions: result.reelPositions,
     };
   }
 
-  private generateResult(): SymbolId[][] {
-    return this.config.reelStrips.map((reel) => {
+  private generateResult(): { reels: SymbolId[][]; reelPositions: number[] } {
+    const reelPositions: number[] = [];
+
+    const reels = this.config.reelStrips.map((reel) => {
+
       const startIndex = Math.floor(
         Math.random() * reel.symbols.length,
       );
-
+      reelPositions.push(startIndex);
       return Array.from(
         { length: this.config.rows },
         (_, index) => {
@@ -32,6 +36,11 @@ export class SlotGame {
         },
       );
     });
+
+    return {
+      reels,
+      reelPositions,
+    };
   }
 
   private evaluate(reels: SymbolId[][]): number {

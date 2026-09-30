@@ -27,6 +27,7 @@ export interface SlotConfig {
 export interface SpinResult {
   reels: SymbolId[][];
   win: number;
+  reelPositions: number[];
 }
 
 export type ReelViewConfig = {
