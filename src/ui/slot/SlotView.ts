@@ -7,6 +7,7 @@ import type { AssetManager } from '../../components';
 export class SlotView extends Container {
   label = 'SlotView';
   private readonly _reels: ReelView[] = [];
+  private readonly _reelStopDelay = 150;
 
   // private readonly _symbolSize: number;
   // private readonly _gap: number;
@@ -82,10 +83,14 @@ export class SlotView extends Container {
         const reelPosition =
           reelPositions[reelIndex];
 
-        return reel.stop(
-          reelResult,
-          reelPosition
-        );
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            reel.stop(
+              reelResult,
+              reelPosition
+            ).then(resolve);
+          }, reelIndex * this._reelStopDelay);
+        });
       },
     );
 
