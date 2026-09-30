@@ -53,6 +53,38 @@ export class SlotView extends Container {
     }
   }
 
+  startSpin(): void {
+    this._reels.forEach(
+      (reel) => {
+        reel.startSpin();
+      },
+    );
+  }
+
+  stop(
+    result: SymbolId[][],
+  ): void {
+    result.forEach(
+      (
+        reelResult,
+        reelIndex,
+      ) => {
+        const reel =
+          this._reels[
+          reelIndex
+          ];
+
+        if (!reel) {
+          return;
+        }
+
+        reel.stop(
+          reelResult,
+        );
+      },
+    );
+  }
+
   setResult(result: SymbolId[][]): void {
     result.forEach((reelSymbols, reelIndex) => {
       const reel = this._reels[reelIndex];

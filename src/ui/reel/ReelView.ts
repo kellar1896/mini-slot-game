@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Ticker } from 'pixi.js';
 import type { ReelViewConfig, SymbolId } from '../../types/game';
 import { SymbolView } from '../symbol/SymbolView';
 import type { SymbolFactory } from '../symbol/SymbolFactory';
@@ -16,12 +16,19 @@ export class ReelView extends Container {
 
   private _stripIndex = 0;
   private _spinning = false;
+  private _stopping = false;
 
   private readonly _spinSpeed = 35;
+  private readonly _stopDuration = 300;
+
+  private _stopElapsed = 0;
+  private _stopStartY = 0;
+
+  private _stopResult: SymbolId[] | null = null;
 
   constructor(
     config: ReelViewConfig,
-    symbolFactory: SymbolFactory
+    symbolFactory: SymbolFactory,
   ) {
     super();
     const {
@@ -39,52 +46,68 @@ export class ReelView extends Container {
       );
     }
 
-    this._symbolSize = symbolSize;
-    this._gap = gap;
     this._reelStrip = reelStrip;
-    this._step = symbolSize + gap;
+
     this._visibleRows = initialSymbols.length;
 
-    this._step =
-      symbolSize + gap;
+    this._symbolSize = symbolSize;
+    this._gap = gap;
+
+    this._step = symbolSize + gap;
 
     this._symbolContainer = new Container();
-    this.addChild(this._symbolContainer);
+
+    this.addChild(
+      this._symbolContainer,
+    );
 
     this.createSymbols(
       initialSymbols,
       symbolFactory,
     );
 
-    // for (let index = 0; index < rows; index++) {
-    //   const initialSymbol = initialSymbols[index];
+    this._stripIndex =
+      this.findInitialStripIndex(
+        initialSymbols,
+      );
 
-    //   if (initialSymbol === undefined) {
-    //     throw new Error(`Missing initial symbol for row ${index}.`);
-    //   }
-
-    //   const symbol = symbolFactory.create(initialSymbol);
-
-    //   symbol.y = index * (symbolSize + gap);
-
-    //   this._symbols.push(symbol);
-    //   this._symbolContainer.addChild(
-    //     symbol,
-    //   );
-    // }
-    this._maskGraphics = new Graphics();
+    this._maskGraphics =
+      new Graphics();
 
     this._maskGraphics
       .rect(
         0,
         0,
         symbolSize,
-        this.getHeight(rows),
+        this.getHeight(
+          this._visibleRows,
+        ),
       )
       .fill(0xffffff);
 
-    this.addChild(this._maskGraphics);
-    this.mask = this._maskGraphics;
+    this.addChild(
+      this._maskGraphics,
+    );
+
+    this.mask =
+      this._maskGraphics;
+
+    this.positionSymbols();
+  }
+
+  destroy(
+    options?: Parameters<
+      Container['destroy']
+    >[0],
+  ): void {
+    Ticker.shared.remove(
+      this.updateSpin,
+      this,
+    );
+
+    super.destroy(
+      options,
+    );
   }
 
   private createSymbols(
@@ -129,17 +152,239 @@ export class ReelView extends Container {
   }
 
   startSpin(): void {
-    // TODO: implement spin reel animation
+    if (
+      this._spinning ||
+      this._stopping
+    ) {
+      return;
+    }
+
+    this._spinning = true;
+
+    Ticker.shared.add(
+      this.updateSpin,
+      this,
+    );
   }
 
   stop(
     result: SymbolId[],
   ): void {
-    this.update(
-      result,
+    if (
+      !this._spinning ||
+      this._stopping
+    ) {
+      this.update(
+        result,
+      );
+
+      return;
+    }
+
+    this._stopping = true;
+    this._stopElapsed = 0;
+    this._stopStartY =
+      this._symbolContainer.y;
+
+    this._stopResult =
+      result;
+  }
+
+  private updateSpin(
+    ticker: Ticker,
+  ): void {
+    if (
+      !this._spinning
+    ) {
+      return;
+    }
+
+    if (
+      this._stopping
+    ) {
+      this.updateStop(
+        ticker,
+      );
+
+      return;
+    }
+
+    this._symbolContainer.y +=
+      this._spinSpeed *
+      ticker.deltaTime;
+
+    while (
+      this._symbolContainer.y >=
+      this._step
+    ) {
+      this._symbolContainer.y -=
+        this._step;
+
+      this.recycleFirstSymbol();
+    }
+  }
+
+  private updateStop(
+    ticker: Ticker,
+  ): void {
+    this._stopElapsed +=
+      ticker.deltaMS;
+
+    const progress =
+      Math.min(
+        this._stopElapsed /
+        this._stopDuration,
+        1,
+      );
+
+    const easedProgress =
+      1 -
+      Math.pow(
+        1 - progress,
+        3,
+      );
+
+    this._symbolContainer.y =
+      this._stopStartY *
+      (1 - easedProgress);
+
+    if (
+      progress >= 1
+    ) {
+      this.finishStop();
+    }
+  }
+
+  private finishStop(): void {
+    this._spinning = false;
+    this._stopping = false;
+
+    Ticker.shared.remove(
+      this.updateSpin,
+      this,
     );
 
-    this._symbolContainer.y = 0;
+    if (
+      this._stopResult
+    ) {
+      this.update(
+        this._stopResult,
+      );
+
+      this._stripIndex =
+        this.findInitialStripIndex(
+          this._stopResult,
+        );
+    }
+
+    // this._symbolContainer.y = 0;
+
+    this.positionSymbols();
+
+    this._stopResult = null;
+  }
+
+  private recycleFirstSymbol(): void {
+    const firstSymbol =
+      this._symbols.shift();
+
+    if (!firstSymbol) {
+      return;
+    }
+
+    this._stripIndex =
+      (
+        this._stripIndex + 1
+      ) %
+      this._reelStrip.length;
+
+    const nextSymbol =
+      this._reelStrip[
+      this._stripIndex
+      ];
+
+    if (!nextSymbol) {
+      return;
+    }
+
+    firstSymbol.setSymbol(
+      nextSymbol,
+    );
+
+    firstSymbol.y =
+      this._symbols.length *
+      this._step;
+
+    this._symbols.push(
+      firstSymbol,
+    );
+
+    this._symbolContainer.removeChild(
+      firstSymbol,
+    );
+
+    this._symbolContainer.addChild(
+      firstSymbol,
+    );
+  }
+
+  private createBufferSymbols(
+    visibleSymbols: SymbolId[],
+  ): SymbolId[] {
+    const previousSymbol =
+      visibleSymbols[
+      visibleSymbols.length - 1
+      ];
+
+    const nextSymbol =
+      visibleSymbols[0];
+
+    return [
+      previousSymbol ?? this._reelStrip[0],
+      ...visibleSymbols,
+      nextSymbol ?? this._reelStrip[0],
+    ].filter(
+      (
+        symbol,
+      ): symbol is SymbolId =>
+        symbol !== undefined,
+    );
+  }
+
+  private positionSymbols(): void {
+    this._symbols.forEach(
+      (
+        symbol,
+        index,
+      ) => {
+        symbol.y =
+          index *
+          this._step;
+      },
+    );
+
+    this._symbolContainer.y =
+      -this._step;
+  }
+
+  private findInitialStripIndex(
+    symbols: SymbolId[],
+  ): number {
+    const firstSymbol =
+      symbols[0];
+
+    if (!firstSymbol) {
+      return 0;
+    }
+
+    const index =
+      this._reelStrip.indexOf(
+        firstSymbol,
+      );
+
+    return index >= 0
+      ? index
+      : 0;
   }
 
   private getHeight(rows: number): number {
@@ -153,14 +398,24 @@ export class ReelView extends Container {
     return this._symbolSize;
   }
 
+  // get height(): number {
+  //   return (
+  //     this._symbols.length * this._symbolSize +
+  //     (this._symbols.length - 1) * this._gap
+  //   );
+  // }
+
   get height(): number {
-    return (
-      this._symbols.length * this._symbolSize +
-      (this._symbols.length - 1) * this._gap
+    return this.getHeight(
+      this._visibleRows,
     );
   }
 
   get reelStrip(): readonly SymbolId[] {
     return this._reelStrip;
+  }
+
+  get isSpinning(): boolean {
+    return this._spinning;
   }
 }
