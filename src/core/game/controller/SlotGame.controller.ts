@@ -63,10 +63,10 @@ export class SlotController {
             type: 'SPIN_REQUEST',
         });
 
+        this._view.startSpin();
+
         const result =
             this._game.spin();
-
-        this._view.startSpin();
 
         await this._view.stop(result.reels);
 

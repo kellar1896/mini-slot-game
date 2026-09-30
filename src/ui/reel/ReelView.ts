@@ -217,7 +217,7 @@ export class ReelView extends Container {
     this._stopResult =
       result;
 
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       this._stopResolve = resolve;
     });
   }
