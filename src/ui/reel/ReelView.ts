@@ -374,6 +374,17 @@ export class ReelView extends Container {
     previousSymbol,
   );
 
+  this._symbols.forEach(
+    (
+      symbol,
+      index,
+    ) => {
+      symbol.y =
+        index *
+        this._step;
+    },
+  );
+
   lastSymbol.y = 0;
 
   this._symbols.unshift(
