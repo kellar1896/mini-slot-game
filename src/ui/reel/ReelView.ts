@@ -27,7 +27,7 @@ export class ReelView extends Container {
   private _spinning = false;
   private _stopping = false;
 
-  private readonly _spinSpeed = 10;
+  private readonly _spinSpeed = 35;
   private readonly _stopDuration = 1000;
 
   private _stopElapsed = 0;
