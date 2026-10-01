@@ -78,7 +78,7 @@ export class SpinButtonView extends Container {
 
         this._background.texture =
             this._assetManager.getTexture(
-                'spin-button-hover',
+                'spin-button-over',
             );
     }
 
