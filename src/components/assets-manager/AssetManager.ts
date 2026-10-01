@@ -40,6 +40,26 @@ export class AssetManager {
         alias: 'F4',
         src: 'src/assets/symbols/low4.png',
       },
+      {
+        alias: 'spin-button-normal',
+        src: 'src/assets/slot/spin_btn_normal.png',
+      },
+      {
+        alias: 'spin-button-hover',
+        src: 'src/assets/slot/spin_btn_hover.png',
+      },
+      {
+        alias: 'spin-button-over',
+        src: 'src/assets/slot/spin_btn_over.png',
+      },
+      {
+        alias: 'spin-button-down',
+        src: 'src/assets/slot/spin_btn_down.png',
+      },
+      {
+        alias: 'spin-button-disabled',
+        src: 'src/assets/slot/spin_btn_disabled.png',
+      }
     ]);
   }
 

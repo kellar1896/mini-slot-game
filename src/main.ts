@@ -37,7 +37,7 @@ const slotView = new SlotView(
   10,
   assetManager
 );
-const spinButton = new SpinButtonView();
+const spinButton = new SpinButtonView(assetManager);
 
 app.stage.addChild(slotView);
 app.stage.addChild(spinButton);

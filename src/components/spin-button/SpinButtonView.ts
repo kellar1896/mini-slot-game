@@ -1,85 +1,119 @@
 import {
     Container,
-    Graphics,
-    Text,
+    Sprite,
 } from 'pixi.js';
+import type { AssetManager } from '../assets-manager/AssetManager';
 
 export class SpinButtonView extends Container {
-    private readonly background: Graphics;
-    private readonly labelText: Text;
+    private readonly _background: Sprite;
+    private readonly _assetManager: AssetManager;
 
-    private enabled = true;
+    private _enabled = true;
 
     constructor(
-        width = 220,
-        height = 70,
+        assetManager: AssetManager,
     ) {
         super();
+        this._assetManager = assetManager;
 
-        this.background =
-            new Graphics();
+        this._background =
+            new Sprite(
+                assetManager.getTexture(
+                    'spin-button-normal',
+                ),
+            );
 
-        this.background
-            .roundRect(
-                0,
-                0,
-                width,
-                height,
-                12,
-            )
-            .fill(0x2f7dff);
-
-        this.labelText =
-            new Text({
-                text: 'SPIN',
-                style: {
-                    fill: 0xffffff,
-                    fontSize: 28,
-                    fontWeight: 'bold',
-                },
-            });
-
-        this.labelText.anchor.set(0.5);
-
-        this.labelText.position.set(
-            width / 2,
-            height / 2,
-        );
 
         this.addChild(
-            this.background,
+            this._background,
         );
 
-        this.addChild(
-            this.labelText,
-        );
 
         this.eventMode = 'static';
         this.cursor = 'pointer';
 
         this.on(
             'pointerdown',
-            () => {
-                if (!this.enabled) {
-                    return;
-                }
+            this.handlePointerDown,
+        );
 
-                this.emit('spin');
-            },
+        this.on(
+            'pointerover',
+            this.handlePointerOver,
+        );
+
+        this.on(
+            'pointerout',
+            this.handlePointerOut,
+        );
+
+        this.on(
+            'pointerup',
+            this.handlePointerUp,
         );
     }
 
     setEnabled(
         enabled: boolean,
     ): void {
-        this.enabled = enabled;
+        this._enabled = enabled;
 
-        this.alpha =
-            enabled ? 1 : 0.5;
+        this._background.texture =
+            this._assetManager.getTexture(
+                enabled
+                    ? 'spin-button-normal'
+                    : 'spin-button-disabled',
+            );
 
         this.eventMode =
             enabled
                 ? 'static'
                 : 'none';
+    }
+
+    private handlePointerOver(): void {
+        if (!this._enabled) {
+            return;
+        }
+
+        this._background.texture =
+            this._assetManager.getTexture(
+                'spin-button-hover',
+            );
+    }
+
+    private handlePointerOut(): void {
+        if (!this._enabled) {
+            return;
+        }
+
+        this._background.texture =
+            this._assetManager.getTexture(
+                'spin-button-normal',
+            );
+    }
+
+    private handlePointerDown(): void {
+        if (!this._enabled) {
+            return;
+        }
+
+        this._background.texture =
+            this._assetManager.getTexture(
+                'spin-button-down',
+            );
+
+        this.emit('spin');
+    }
+
+    private handlePointerUp(): void {
+        if (!this._enabled) {
+            return;
+        }
+
+        this._background.texture =
+            this._assetManager.getTexture(
+                'spin-button-hover',
+            );
     }
 }
