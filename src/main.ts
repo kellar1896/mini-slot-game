@@ -8,6 +8,7 @@ import { GameApplication } from './ui/app/GameApplication';
 import { SlotLayout } from './ui/slot/SlotLayout';
 import { SlotScaler } from './ui/slot/SlotScaler';
 import { SlotView } from './ui/slot/SlotView';
+import { BackgroundView } from './ui/background/BackgroundView';
 
 
 const container = document.querySelector<HTMLDivElement>('#app');
@@ -23,6 +24,12 @@ await app.init(container);
 await assetManager.load();
 
 const game = new SlotGame(slotConfig);
+
+const backgroundView = new BackgroundView(
+  assetManager,
+);
+
+app.stage.addChild(backgroundView);
 
 const slotView = new SlotView(
   slotConfig,
@@ -48,6 +55,11 @@ const scaler = new SlotScaler({
 
 
 const updateLayout = (): void => {
+  backgroundView.resize(
+    app.screen.width,
+    app.screen.height,
+  );
+
   const scale = scaler.calculate(
     app.screen.width,
   );
