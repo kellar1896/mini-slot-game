@@ -28,6 +28,16 @@ export interface SpinResult {
   reels: SymbolId[][];
   win: number;
   reelPositions: number[];
+  wins: Wins[];
+}
+
+export interface Wins {
+  pattern: {
+    column: number;
+    row: number;
+  }[];
+  winAmount: number;
+  symbol: SymbolId;
 }
 
 export type ReelViewConfig = {
