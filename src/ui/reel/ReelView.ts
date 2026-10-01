@@ -27,7 +27,7 @@ export class ReelView extends Container {
   private _spinning = false;
   private _stopping = false;
 
-  private readonly _spinSpeed = 35;
+  private readonly _spinSpeed = 10;
   private readonly _stopDuration = 1000;
 
   private _stopElapsed = 0;
@@ -389,7 +389,8 @@ export class ReelView extends Container {
       },
     );
 
-    lastSymbol.y = 0;
+    // lastSymbol.y = 0;
+    lastSymbol.y = -this._step;
 
     this._symbols.unshift(
       lastSymbol,
@@ -486,13 +487,14 @@ export class ReelView extends Container {
         index,
       ) => {
         symbol.y =
-          index *
+          (index - 1) *
           this._step;
       },
     );
 
-    this._symbolContainer.y =
-      -this._step;
+    // this._symbolContainer.y =
+    //   -this._step;
+    this._symbolContainer.y = 0;
   }
 
   private findInitialStripIndex(
