@@ -5,6 +5,14 @@ export class AssetManager {
   async load(): Promise<void> {
     await Assets.load([
       {
+        alias: 'slot-background',
+        src: 'src/assets/slot/background.jpg',
+      },
+      {
+        alias: 'reel-base',
+        src: 'src/assets/slot/reels_base.png',
+      },
+      {
         alias: 'M1',
         src: 'src/assets/symbols/high1.png',
       },
@@ -38,16 +46,19 @@ export class AssetManager {
   getSymbolTexture(
     symbol: SymbolId,
   ): Texture {
+    return this.getTexture(symbol);
+  }
+
+  getTexture(alias: string): Texture {
     const texture = Assets.get(
-      `${symbol}`,
+      alias,
     );
 
     if (!texture) {
       throw new Error(
-        `Texture not found for symbol: ${symbol}`,
+        `Texture not found for alias: ${alias}`,
       );
     }
-
     return texture;
   }
 }

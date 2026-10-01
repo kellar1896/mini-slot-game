@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Sprite } from 'pixi.js';
 import type { ReelViewConfig, SlotConfig, SymbolId } from '../../types/game';
 import { ReelView } from '../reel/ReelView';
 import { SymbolFactory } from '../symbol/SymbolFactory';
@@ -7,6 +7,8 @@ import type { AssetManager } from '../../components';
 export class SlotView extends Container {
   label = 'SlotView';
   private readonly _reels: ReelView[] = [];
+  private readonly _reelsContainer: Container;
+  private readonly _reelsBase: Sprite;
   private readonly _reelStopDelay = 150;
 
   // private readonly _symbolSize: number;
@@ -22,6 +24,16 @@ export class SlotView extends Container {
     // this._symbolSize = symbolSize;
     // this._gap = gap;
 
+    this._reelsContainer = new Container();
+    this._reelsBase =
+      new Sprite(
+        assetManager.getTexture(
+          'reel-base',
+        ),
+      );
+
+    this.addChild(this._reelsBase);
+    this.addChild(this._reelsContainer);
 
     const symbolFactory = new SymbolFactory({
       symbolSize,
@@ -50,7 +62,8 @@ export class SlotView extends Container {
       );
 
       this._reels.push(reel);
-      this.addChild(reel);
+      this._reelsContainer
+        .addChild(reel);
     }
   }
 
