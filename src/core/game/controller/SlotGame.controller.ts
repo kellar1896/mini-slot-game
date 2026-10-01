@@ -11,6 +11,7 @@ import { SlotGame } from '../model/SlotGame';
 import { slotMachine } from '../../state-machine/slot-machine.state';
 import type { GameEvent } from '../../events/GameEvent';
 import type { GameEventBus } from '../../events/GameEventBus';
+import type { SpinButtonView } from '../../../components';
 
 export class SlotController {
     private readonly actor: ReturnType<
@@ -19,15 +20,18 @@ export class SlotController {
 
     private readonly _game: SlotGame;
     private readonly _view: SlotView;
+    private readonly _spinButton: SpinButtonView;
     private readonly _eventSubscription: Subscription;
 
     constructor(
         game: SlotGame,
         view: SlotView,
+        spinButton: SpinButtonView,
         eventBus: GameEventBus,
     ) {
         this._game = game;
         this._view = view;
+        this._spinButton = spinButton;
 
         this.actor = createActor(
             slotMachine,
@@ -63,6 +67,7 @@ export class SlotController {
             type: 'SPIN_REQUEST',
         });
 
+        this._spinButton.setEnabled(false);
         this._view.startSpin();
 
         await new Promise((resolve) =>
@@ -86,10 +91,12 @@ export class SlotController {
             this.actor.send({
                 type: 'WIN_COMPLETED',
             });
+            this._spinButton.setEnabled(true);
         } else {
             this.actor.send({
                 type: 'NO_WIN',
             });
+            this._spinButton.setEnabled(true);
         }
     }
 

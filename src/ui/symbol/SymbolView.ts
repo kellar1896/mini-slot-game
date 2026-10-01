@@ -19,9 +19,9 @@ export class SymbolView extends Container {
     this._background = new Graphics();
 
     this._background
-      .roundRect(0, 0, size, size, 8)
+      .rect(0, 0, size, size)
       .fill(0x222222);
-
+    this._background.alpha = 0.5;
 
     this._sprite =
       new Sprite(

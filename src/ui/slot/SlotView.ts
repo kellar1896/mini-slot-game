@@ -11,9 +11,6 @@ export class SlotView extends Container {
   private readonly _reelsBase: Sprite;
   private readonly _reelStopDelay = 150;
 
-  // private readonly _symbolSize: number;
-  // private readonly _gap: number;
-
   constructor(
     slotConfig: SlotConfig,
     symbolSize: number,
@@ -21,8 +18,6 @@ export class SlotView extends Container {
     assetManager: AssetManager
   ) {
     super();
-    // this._symbolSize = symbolSize;
-    // this._gap = gap;
 
     this._reelsContainer = new Container();
     this._reelsBase =
@@ -31,6 +26,7 @@ export class SlotView extends Container {
           'reel-base',
         ),
       );
+    this._reelsBase.label = 'reels-decorators'; 
 
     this.addChild(this._reelsBase);
     this.addChild(this._reelsContainer);
@@ -65,6 +61,10 @@ export class SlotView extends Container {
       this._reelsContainer
         .addChild(reel);
     }
+  this._reelsBase.width =
+      this._reelsContainer.width;
+  this._reelsBase.height =
+      this._reelsContainer.height;
   }
 
   startSpin(): void {
@@ -121,27 +121,4 @@ export class SlotView extends Container {
       reel.update(reelSymbols);
     });
   }
-
-  // get width(): number {
-  //   return (
-  //     this._reels.length * 2 * this._symbolSize +
-  //     (this._reels.length - 1) * 2 * this._gap
-  //   );
-  // }
-
-  // get height(): number {
-  //   return this._reels[0]?.height ?? 0;
-  // }
-
-  // set width(value: number) {
-  //   const scale = value / this.width;
-
-  //   this.scale.set(scale, scale);
-  // }
-
-  // set height(value: number) {
-  //   const scale = value / this.height;
-
-  //   this.scale.set(scale, scale);
-  // }
 }

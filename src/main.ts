@@ -1,5 +1,5 @@
 import { AssetManager, SpinButtonView } from './components';
-import { slotConfig } from './core/config/slot.config';
+import { slotConfig, symbolSize } from './core/config/slot.config';
 import { GameEventBus } from './core/events/GameEventBus';
 import { SpinInput } from './core/events/SpinInput';
 import { SlotController, SlotGame } from './core/game';
@@ -33,8 +33,8 @@ app.stage.addChild(backgroundView);
 
 const slotView = new SlotView(
   slotConfig,
-  240,
-  10,
+  symbolSize,
+  0,
   assetManager
 );
 const spinButton = new SpinButtonView(assetManager);
@@ -49,7 +49,7 @@ const layout = new SlotLayout(
 const scaler = new SlotScaler({
   min: 0.6,
   max: 1.2,
-  referenceWidth: 1280,
+  referenceWidth: 1400,
 });
 
 
@@ -65,6 +65,7 @@ const updateLayout = (): void => {
   );
 
   slotView.scale.set(scale);
+  spinButton.scale.set(scale);
 
   layout.center(
     app.screen.width,
@@ -76,9 +77,8 @@ const updateLayout = (): void => {
       spinButton.width) / 2;
 
   spinButton.y =
-    slotView.y +
-    slotView.height +
-    30;
+    app.screen.height - spinButton.height -
+    10;
 };
 
 updateLayout();
@@ -94,15 +94,9 @@ new SpinInput(
 new SlotController(
     game,
     slotView,
+    spinButton,
     eventBus
   );
-
-
-// const result = game.spin();
-
-// slotView.setResult(
-//   result.reels,
-// );
 
 window.addEventListener(
   'resize',

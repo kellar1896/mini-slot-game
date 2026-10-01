@@ -1,5 +1,7 @@
 import type { SlotConfig } from "../../types/game";
 
+export const symbolSize = 180;
+
 
 export const slotConfig: SlotConfig = {
   rows: 3,
