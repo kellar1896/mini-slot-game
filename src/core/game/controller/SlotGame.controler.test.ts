@@ -32,14 +32,19 @@ describe(
                 const view = {
                     setResult: vi.fn(),
                 };
+                const spinButton = {
+                    setEnabled: vi.fn(() => {}),
+                };
 
                 const eventBus =
                     new GameEventBus();
+
 
                 const controller =
                     new SlotController(
                         game as any,
                         view as any,
+                        spinButton as any,
                         eventBus,
                     );
 
