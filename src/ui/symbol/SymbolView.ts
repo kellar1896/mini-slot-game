@@ -40,7 +40,7 @@ export class SymbolView extends Container {
 
 
 
-    this.addChild(this._background);
+    // this.addChild(this._background);
     this.addChild(this._sprite);
   }
 

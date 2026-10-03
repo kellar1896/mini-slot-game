@@ -9,6 +9,7 @@ import { SlotLayout } from './ui/slot/SlotLayout';
 import { SlotScaler } from './ui/slot/SlotScaler';
 import { SlotView } from './ui/slot/SlotView';
 import { BackgroundView } from './ui/background/BackgroundView';
+import { WaysWinView } from './components/ways-win/WaysWinView';
 
 
 const container = document.querySelector<HTMLDivElement>('#app');
@@ -38,12 +39,15 @@ const slotView = new SlotView(
   assetManager
 );
 const spinButton = new SpinButtonView(assetManager);
+const waysWin = new WaysWinView(slotConfig);
 
 app.stage.addChild(slotView);
+app.stage.addChild (waysWin);
 app.stage.addChild(spinButton);
 
 const layout = new SlotLayout(
   slotView,
+  waysWin
 );
 
 const scaler = new SlotScaler({
@@ -65,6 +69,7 @@ const updateLayout = (): void => {
   );
 
   slotView.scale.set(scale);
+  waysWin.scale.set(scale);
   spinButton.scale.set(scale);
 
   layout.center(
@@ -94,6 +99,7 @@ new SpinInput(
 new SlotController(
     game,
     slotView,
+    waysWin,
     spinButton,
     eventBus
   );

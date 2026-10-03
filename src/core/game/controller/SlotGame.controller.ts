@@ -12,6 +12,7 @@ import { slotMachine } from '../../state-machine/slot-machine.state';
 import type { GameEvent } from '../../events/GameEvent';
 import type { GameEventBus } from '../../events/GameEventBus';
 import type { SpinButtonView } from '../../../components';
+import type { WaysWinView } from '../../../components/ways-win/WaysWinView';
 
 export class SlotController {
     private readonly actor: ReturnType<
@@ -19,18 +20,21 @@ export class SlotController {
     >;
 
     private readonly _game: SlotGame;
-    private readonly _view: SlotView;
+    private readonly _slotView: SlotView;
+    private readonly _winsView: WaysWinView;
     private readonly _spinButton: SpinButtonView;
     private readonly _eventSubscription: Subscription;
 
     constructor(
         game: SlotGame,
-        view: SlotView,
+        slotView: SlotView,
+        winsView: WaysWinView,
         spinButton: SpinButtonView,
         eventBus: GameEventBus,
     ) {
         this._game = game;
-        this._view = view;
+        this._slotView = slotView;
+        this._winsView = winsView;
         this._spinButton = spinButton;
 
         this.actor = createActor(
@@ -67,8 +71,9 @@ export class SlotController {
             type: 'SPIN_REQUEST',
         });
 
+        this._winsView.resetOverlays();
         this._spinButton.setEnabled(false);
-        this._view.startSpin();
+        this._slotView.startSpin();
 
         await new Promise((resolve) =>
             setTimeout(resolve, 2000),
@@ -77,7 +82,8 @@ export class SlotController {
         const result =
             this._game.spin();
 
-        await this._view.stop(result.reels, result.reelPositions);
+        await this._slotView.stop(result.reels, result.reelPositions);
+        this._winsView.showPattern(result.wins[0]?.pattern ?? [])
 
         this.actor.send({
             type: 'REELS_STOPPED',

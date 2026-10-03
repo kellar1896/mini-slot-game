@@ -32,18 +32,20 @@ export interface SpinResult {
 }
 
 export interface Wins {
-  pattern: {
-    column: number;
-    row: number;
-  }[];
+  pattern: Array<SymbolPosition>;
   winAmount: number;
   symbol: SymbolId;
 }
 
-export type ReelViewConfig = {
+export interface ReelViewConfig {
   initialSymbols: SymbolId[];
   reelStrip: SymbolId[];
   rows: number;
   symbolSize: number;
   gap: number;
 };
+
+export interface SymbolPosition {
+  column: number;
+  row: number;
+}

@@ -121,4 +121,12 @@ export class SlotView extends Container {
       reel.update(reelSymbols);
     });
   }
+
+  get slotWidth(): number {
+    return this._reelsContainer.width;
+  }
+
+  get slotHeight(): number {
+    return this._reelsContainer.height;
+  }
 }
