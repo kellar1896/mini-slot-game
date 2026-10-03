@@ -76,6 +76,7 @@ const updateLayout = (): void => {
   );
 
   slotView.scale.set(scale);
+  spinButton.scale.set(scale * 0.5);
 
   layout.center(
     app.screen.width,
