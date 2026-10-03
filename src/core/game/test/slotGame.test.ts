@@ -35,6 +35,17 @@ describe('SlotGame', () => {
     });
   });
 
+  it('forces wins for each selected symbol across every reel', () => {
+    const game = new SlotGame(slotConfig);
+
+    const result = game.spinWithSymbols(['M1', 'M2']);
+
+    expect(result.reels).toHaveLength(slotConfig.reels);
+    expect(result.reels.every((reel) => reel[0] === 'M1' && reel[1] === 'M2')).toBe(true);
+    expect(result.wins.map(({ symbol }) => symbol)).toEqual(['M1', 'M2']);
+    expect(result.reelPositions).toEqual(Array(slotConfig.reels).fill(0));
+  });
+
   it('pays each way of 3+ matching symbols across consecutive reels', () => {
     const game = new SlotGame({
       ...slotConfig,

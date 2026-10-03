@@ -13,6 +13,39 @@ export class SlotGame {
     return result;
   }
 
+  spinWithSymbols(forcedSymbols: SymbolId[]): SpinResult {
+    const selectedSymbols = [...forcedSymbols]
+      .filter((symbol) => this.config.symbols.some(({ id }) => id === symbol))
+      .slice(0, this.config.rows);
+
+    if (selectedSymbols.length === 0) {
+      return this.spin();
+    }
+
+    const nonWinningSymbols = this.config.symbols
+      .map(({ id }) => id)
+      .filter((symbol) => !selectedSymbols.includes(symbol));
+
+    const reels = Array.from({ length: this.config.reels }, (_, column) =>
+      Array.from({ length: this.config.rows }, (_, row) => {
+        const forcedSymbol = selectedSymbols[row];
+        if (forcedSymbol) {
+          return forcedSymbol;
+        }
+
+        return nonWinningSymbols[column % nonWinningSymbols.length] ?? selectedSymbols[0]!;
+      }),
+    );
+
+    const { win, wins } = this.evaluate(reels);
+    return {
+      reels,
+      win,
+      reelPositions: Array.from({ length: this.config.reels }, () => 0),
+      wins,
+    };
+  }
+
   private generateResult(): SpinResult {
     const reelPositions: number[] = [];
 

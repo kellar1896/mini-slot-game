@@ -1,4 +1,4 @@
-import { AssetManager, SpinButtonView } from './components';
+import { AssetManager, SandboxView, SpinButtonView } from './components';
 import { slotConfig, symbolSize } from './core/config/slot.config';
 import { GameEventBus } from './core/events/GameEventBus';
 import { SpinInput } from './core/events/SpinInput';
@@ -101,12 +101,19 @@ new SpinInput(
   eventBus,
 );
 
-new SlotController(
+const controller = new SlotController(
   game,
   slotView,
   spinButton,
   eventBus
 );
+
+const sandbox = new SandboxView(
+  slotConfig.symbols,
+  slotConfig.rows,
+  (symbols) => controller.spin(symbols),
+);
+container.appendChild(sandbox.element);
 
 window.addEventListener(
   'resize',

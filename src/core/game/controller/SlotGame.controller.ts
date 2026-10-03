@@ -12,6 +12,7 @@ import type { GameEvent } from '../../events/GameEvent';
 import type { GameEventBus } from '../../events/GameEventBus';
 import type { SpinButtonView } from '../../../components';
 import type { Slot, SlotView } from '../../../ui/slot';
+import type { SymbolId } from '../../../types/game';
 
 export class SlotController {
     private readonly actor: ReturnType<
@@ -55,7 +56,7 @@ export class SlotController {
                 });
     }
 
-    async spin(): Promise<void> {
+    async spin(forcedSymbols?: SymbolId[]): Promise<void> {
         if (
             this.actor.getSnapshot().value !==
             'idle'
@@ -75,8 +76,9 @@ export class SlotController {
             setTimeout(resolve, 2000),
         );
 
-        const result =
-            this._game.spin();
+        const result = forcedSymbols?.length
+            ? this._game.spinWithSymbols(forcedSymbols)
+            : this._game.spin();
 
         await this._slotView.slotMachine.stop(result.reels, result.reelPositions);
         this._slotView.winsView.iterateWins(result.wins);
