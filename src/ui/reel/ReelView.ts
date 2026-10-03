@@ -406,50 +406,6 @@ export class ReelView extends Container {
     );
   }
 
-  private recycleFirstSymbol(): void {
-    const firstSymbol =
-      this._symbols.shift();
-
-    if (!firstSymbol) {
-      return;
-    }
-
-    this._stripIndex =
-      (
-        this._stripIndex + 1
-      ) %
-      this._reelStrip.length;
-
-    const nextSymbol =
-      this._reelStrip[
-      this._stripIndex
-      ];
-
-    if (!nextSymbol) {
-      return;
-    }
-
-    firstSymbol.setSymbol(
-      nextSymbol,
-    );
-
-    firstSymbol.y =
-      this._symbols.length *
-      this._step;
-
-    this._symbols.push(
-      firstSymbol,
-    );
-
-    this._symbolContainer.removeChild(
-      firstSymbol,
-    );
-
-    this._symbolContainer.addChild(
-      firstSymbol,
-    );
-  }
-
   private createBufferSymbols(
     visibleSymbols: SymbolId[],
   ): SymbolId[] {
