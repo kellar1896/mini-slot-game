@@ -199,7 +199,7 @@ export class ReelView extends Container {
     result: SymbolId[],
     targetPosition: number
   ): Promise<void> {
-    if(
+    if (
       targetPosition < 0 ||
       targetPosition >= this._reelStrip.length
     ) {
@@ -232,7 +232,9 @@ export class ReelView extends Container {
     const extraRotations = 1; // Number of extra rotations before stopping wip
     const symbolsToTravel = distanceToTarget + extraRotations * reelLength;
 
-    this._stopDistance = symbolsToTravel * this._step;
+    this._stopDistance =
+      symbolsToTravel * this._step -
+      this._symbolContainer.y;
 
     this._stopResult =
       result;
@@ -325,7 +327,7 @@ export class ReelView extends Container {
   private finishStop(): void {
     this._spinning = false;
     this._stopping = false;
-    
+
     Ticker.shared.remove(
       this.updateSpin,
       this,
@@ -367,7 +369,12 @@ export class ReelView extends Container {
 
     const previousSymbol =
       this._reelStrip[
-      this._stripIndex
+      (
+        this._stripIndex -
+        1 +
+        this._reelStrip.length
+      ) %
+      this._reelStrip.length
       ];
 
     if (!previousSymbol) {
@@ -389,7 +396,6 @@ export class ReelView extends Container {
       },
     );
 
-    // lastSymbol.y = 0;
     lastSymbol.y = -this._step;
 
     this._symbols.unshift(
@@ -447,9 +453,7 @@ export class ReelView extends Container {
           this._step;
       },
     );
-
-    // this._symbolContainer.y =
-    //   -this._step;
+  
     this._symbolContainer.y = 0;
   }
 
