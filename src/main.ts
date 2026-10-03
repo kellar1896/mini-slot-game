@@ -54,9 +54,7 @@ app.stage.addChild(slotView);
 app.stage.addChild(spinButton);
 
 const layout = new SlotLayout([
-  slotMachineView,
-  waysWin,
-  reelsFrame
+  slotView
 ]);
 
 const scaler = new SlotScaler({
@@ -77,10 +75,7 @@ const updateLayout = (): void => {
     app.screen.width,
   );
 
-  slotMachineView.scale.set(scale);
-  waysWin.scale.set(scale);
-  spinButton.scale.set(scale);
-  reelsFrame.scale.set(scale);
+  slotView.scale.set(scale);
 
   layout.center(
     app.screen.width,
@@ -108,8 +103,7 @@ new SpinInput(
 
 new SlotController(
   game,
-  slotMachineView,
-  waysWin,
+  slotView,
   spinButton,
   eventBus
 );

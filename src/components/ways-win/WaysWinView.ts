@@ -1,9 +1,10 @@
 import { Container, Graphics } from "pixi.js";
-import type { SlotConfig, SymbolPosition } from "../../types/game";
+import type { SlotConfig, SymbolPosition, Wins } from "../../types/game";
 import { symbolSize } from "../../core/config/slot.config";
+import type { WinsView } from "../../types";
 
 
-export class WaysWinView extends Container {
+export class WaysWinView extends Container implements WinsView {
     label = 'ways-container';
 
     private readonly _reelsOverlays: Array<Array<Graphics>> = [];
@@ -51,5 +52,9 @@ export class WaysWinView extends Container {
             }
             symbolOverlay.alpha = 0.2;
         });
+    }
+
+    iterateWins(wins: Array<Wins>): void {
+        // TODO: Implement the logic to iterate through wins and highlight them accordingly.
     }
 }

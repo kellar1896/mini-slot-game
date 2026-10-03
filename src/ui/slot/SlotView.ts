@@ -1,15 +1,17 @@
 import { Container } from 'pixi.js';
+import type { WinsView } from '../../types';
+import type { Slot } from './Slot';
+import type { SlotMachine } from './SlotMachine';
 
-/** Parent view for the slot machine's reels and win display. */
-export class SlotView extends Container {
+export class SlotView extends Container implements Slot {
 	
     private readonly _reelFrameContainer: Container;
-    private readonly _winsContainer: Container;
-    private readonly _slotMachineContainer: Container;
+    private readonly _winsContainer: WinsView;
+    private readonly _slotMachineContainer: SlotMachine;
 
 	public constructor(
-        slotMachineContainer: Container,
-        winsContainer: Container,
+        slotMachineContainer: SlotMachine,
+        winsContainer: WinsView,
         reelFrameContainer: Container
     ) {
 		super();
@@ -26,6 +28,14 @@ export class SlotView extends Container {
 	}
 
     updateLayout(): void {
-        // TODO: Implement layout update logic for children containers
+        
+    }
+
+    get winsView(): WinsView {
+        return this._winsContainer;
+    }
+
+    get slotMachine(): SlotMachine {
+        return this._slotMachineContainer;
     }
 }

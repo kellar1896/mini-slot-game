@@ -3,8 +3,9 @@ import type { ReelViewConfig, SlotConfig, SymbolId } from '../../types/game';
 import { ReelView } from '../reel/ReelView';
 import { SymbolFactory } from '../symbol/SymbolFactory';
 import type { AssetManager } from '../../components';
+import type { SlotMachine } from './SlotMachine';
 
-export class SlotMachineView extends Container {
+export class SlotMachineView extends Container implements SlotMachine {
   label = 'slot-machine-view';
   private readonly _reels: ReelView[] = [];
   private readonly _reelsContainer: Container;
@@ -108,11 +109,11 @@ export class SlotMachineView extends Container {
     });
   }
 
-  get slotWidth(): number {
+  get slotMachineWidth(): number {
     return this._reelsContainer.width;
   }
 
-  get slotHeight(): number {
+  get slotMachineHeight(): number {
     return this._reelsContainer.height;
   }
 }

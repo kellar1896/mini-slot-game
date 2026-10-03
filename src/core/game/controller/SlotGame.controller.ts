@@ -6,13 +6,12 @@ import {
     Subscription,
 } from 'rxjs';
 
-import { SlotMachineView } from '../../../ui/slot/SlotMachineView';
 import { SlotGame } from '../model/SlotGame';
 import { slotMachine } from '../../state-machine/slot-machine.state';
 import type { GameEvent } from '../../events/GameEvent';
 import type { GameEventBus } from '../../events/GameEventBus';
 import type { SpinButtonView } from '../../../components';
-import type { WaysWinView } from '../../../components/ways-win/WaysWinView';
+import type { Slot, SlotView } from '../../../ui/slot';
 
 export class SlotController {
     private readonly actor: ReturnType<
@@ -20,21 +19,18 @@ export class SlotController {
     >;
 
     private readonly _game: SlotGame;
-    private readonly _slotView: SlotMachineView;
-    private readonly _winsView: WaysWinView;
+    private readonly _slotView: Slot;
     private readonly _spinButton: SpinButtonView;
     private readonly _eventSubscription: Subscription;
 
     constructor(
         game: SlotGame,
-        slotView: SlotMachineView,
-        winsView: WaysWinView,
+        slotView: SlotView,
         spinButton: SpinButtonView,
         eventBus: GameEventBus,
     ) {
         this._game = game;
         this._slotView = slotView;
-        this._winsView = winsView;
         this._spinButton = spinButton;
 
         this.actor = createActor(
@@ -71,9 +67,9 @@ export class SlotController {
             type: 'SPIN_REQUEST',
         });
 
-        this._winsView.resetOverlays();
+        this._slotView.winsView.resetOverlays();
         this._spinButton.setEnabled(false);
-        this._slotView.startSpin();
+        this._slotView.slotMachine.startSpin();
 
         await new Promise((resolve) =>
             setTimeout(resolve, 2000),
@@ -82,8 +78,8 @@ export class SlotController {
         const result =
             this._game.spin();
 
-        await this._slotView.stop(result.reels, result.reelPositions);
-        this._winsView.showPattern(result.wins[0]?.pattern ?? [])
+        await this._slotView.slotMachine.stop(result.reels, result.reelPositions);
+        this._slotView.winsView.showPattern(result.wins[0]?.pattern ?? [])
 
         this.actor.send({
             type: 'REELS_STOPPED',
