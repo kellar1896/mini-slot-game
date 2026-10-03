@@ -79,7 +79,7 @@ export class SlotController {
             this._game.spin();
 
         await this._slotView.slotMachine.stop(result.reels, result.reelPositions);
-        this._slotView.winsView.showPattern(result.wins[0]?.pattern ?? [])
+        this._slotView.winsView.iterateWins(result.wins);
 
         this.actor.send({
             type: 'REELS_STOPPED',
