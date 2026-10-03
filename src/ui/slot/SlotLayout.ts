@@ -1,31 +1,24 @@
 import type { Container } from 'pixi.js';
 
 export class SlotLayout {
-private readonly _slotContainer: Container;
-private readonly _winsContainer: Container;
+  private readonly _slotViewContainers: Container[];
 
   constructor(
-    slotContainer: Container,
-    winsContainer: Container
+    slotContainers: Container[],
   ) {
-    this._slotContainer = slotContainer;
-    this._winsContainer = winsContainer;
+    this._slotViewContainers = slotContainers;
   }
 
   center(
     width: number,
     height: number,
   ): void {
-    this._slotContainer.x =
-      (width - this._slotContainer.width) / 2;
+    for (const container of this._slotViewContainers) {
+      container.x =
+        (width - container.width) / 2;
 
-    this._slotContainer.y =
-      (height - this._slotContainer.height) / 2;
-
-    this._winsContainer.x =
-      (width - this._winsContainer.width) / 2;
-
-    this._winsContainer.y =
-      (height - this._winsContainer.height) / 2;
+      container.y =
+        (height - container.height) / 2;
+    }
   }
 }

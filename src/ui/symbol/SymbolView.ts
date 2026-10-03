@@ -20,8 +20,7 @@ export class SymbolView extends Container {
 
     this._background
       .rect(0, 0, size, size)
-      .fill(0x222222);
-    this._background.alpha = 0.5;
+      .fill(0x000000);
 
     this._sprite =
       new Sprite(
@@ -40,7 +39,7 @@ export class SymbolView extends Container {
 
 
 
-    // this.addChild(this._background);
+    this.addChild(this._background);
     this.addChild(this._sprite);
   }
 

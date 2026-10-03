@@ -7,9 +7,11 @@ import './style.css';
 import { GameApplication } from './ui/app/GameApplication';
 import { SlotLayout } from './ui/slot/SlotLayout';
 import { SlotScaler } from './ui/slot/SlotScaler';
-import { SlotView } from './ui/slot/SlotView';
+import { SlotMachineView } from './ui/slot/SlotMachineView';
 import { BackgroundView } from './ui/background/BackgroundView';
 import { WaysWinView } from './components/ways-win/WaysWinView';
+import { ReelFrameView } from './components/reels-frame/ReelFrameView';
+import { SlotView } from './ui/slot/SlotView';
 
 
 const container = document.querySelector<HTMLDivElement>('#app');
@@ -30,25 +32,32 @@ const backgroundView = new BackgroundView(
   assetManager,
 );
 
-app.stage.addChild(backgroundView);
-
-const slotView = new SlotView(
+const slotMachineView = new SlotMachineView(
   slotConfig,
   symbolSize,
   0,
   assetManager
 );
+
 const spinButton = new SpinButtonView(assetManager);
 const waysWin = new WaysWinView(slotConfig);
+const reelsFrame = new ReelFrameView(slotConfig, assetManager);
 
+const slotView= new SlotView(
+  slotMachineView,
+  waysWin,
+  reelsFrame
+);
+
+app.stage.addChild(backgroundView);
 app.stage.addChild(slotView);
-app.stage.addChild (waysWin);
 app.stage.addChild(spinButton);
 
-const layout = new SlotLayout(
-  slotView,
-  waysWin
-);
+const layout = new SlotLayout([
+  slotMachineView,
+  waysWin,
+  reelsFrame
+]);
 
 const scaler = new SlotScaler({
   min: 0.6,
@@ -68,9 +77,10 @@ const updateLayout = (): void => {
     app.screen.width,
   );
 
-  slotView.scale.set(scale);
+  slotMachineView.scale.set(scale);
   waysWin.scale.set(scale);
   spinButton.scale.set(scale);
+  reelsFrame.scale.set(scale);
 
   layout.center(
     app.screen.width,
@@ -97,12 +107,12 @@ new SpinInput(
 );
 
 new SlotController(
-    game,
-    slotView,
-    waysWin,
-    spinButton,
-    eventBus
-  );
+  game,
+  slotMachineView,
+  waysWin,
+  spinButton,
+  eventBus
+);
 
 window.addEventListener(
   'resize',

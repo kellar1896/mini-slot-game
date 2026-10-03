@@ -1,132 +1,31 @@
-import { Container, Sprite } from 'pixi.js';
-import type { ReelViewConfig, SlotConfig, SymbolId } from '../../types/game';
-import { ReelView } from '../reel/ReelView';
-import { SymbolFactory } from '../symbol/SymbolFactory';
-import type { AssetManager } from '../../components';
+import { Container } from 'pixi.js';
 
+/** Parent view for the slot machine's reels and win display. */
 export class SlotView extends Container {
-  label = 'SlotView';
-  private readonly _reels: ReelView[] = [];
-  private readonly _reelsContainer: Container;
-  private readonly _reelsBase: Sprite;
-  private readonly _reelStopDelay = 150;
+	
+    private readonly _reelFrameContainer: Container;
+    private readonly _winsContainer: Container;
+    private readonly _slotMachineContainer: Container;
 
-  constructor(
-    slotConfig: SlotConfig,
-    symbolSize: number,
-    gap: number,
-    assetManager: AssetManager
-  ) {
-    super();
-
-    this._reelsContainer = new Container();
-    this._reelsBase =
-      new Sprite(
-        assetManager.getTexture(
-          'reel-base',
-        ),
-      );
-    this._reelsBase.label = 'reels-decorators'; 
-
-    this.addChild(this._reelsBase);
-    this.addChild(this._reelsContainer);
-
-    const symbolFactory = new SymbolFactory({
-      symbolSize,
-    },
-      assetManager);
-
-    for (
-      let index = 0;
-      index < slotConfig.reels;
-      index++
+	public constructor(
+        slotMachineContainer: Container,
+        winsContainer: Container,
+        reelFrameContainer: Container
     ) {
-      const reelConfig: ReelViewConfig = {
-        initialSymbols: slotConfig.defaultReels[index] || [],
-        reelStrip: slotConfig.reelStrips[index]?.symbols || [],
-        rows: slotConfig.rows,
-        symbolSize,
-        gap,
-      };
+		super();
 
-      const reel = new ReelView(
-        reelConfig,
-        symbolFactory
-      );
-      reel.x = index * (
-        symbolSize + gap
-      );
+		this.label = 'slot-view';
+		
+        this._slotMachineContainer = slotMachineContainer;
+        this._winsContainer = winsContainer;
+        this._reelFrameContainer = reelFrameContainer;
 
-      this._reels.push(reel);
-      this._reelsContainer
-        .addChild(reel);
+        this.addChild(this._slotMachineContainer);
+        this.addChild(this._winsContainer);
+        this.addChild(this._reelFrameContainer);
+	}
+
+    updateLayout(): void {
+        // TODO: Implement layout update logic for children containers
     }
-  this._reelsBase.width =
-      this._reelsContainer.width;
-  this._reelsBase.height =
-      this._reelsContainer.height;
-  }
-
-  startSpin(): void {
-    this._reels.forEach(
-      (reel) => {
-        reel.startSpin();
-      },
-    );
-  }
-
-  stop(
-    result: SymbolId[][],
-    reelPositions: number[]
-  ): Promise<void> {
-    const stopPromises = result.map(
-      (
-        reelResult,
-        reelIndex,
-      ) => {
-        const reel =
-          this._reels[
-          reelIndex
-          ];
-
-        if (!reel) {
-          return Promise.resolve();
-        }
-
-        const reelPosition =
-          reelPositions[reelIndex];
-
-        return new Promise<void>((resolve) => {
-          setTimeout(() => {
-            reel.stop(
-              reelResult,
-              reelPosition
-            ).then(resolve);
-          }, reelIndex * this._reelStopDelay);
-        });
-      },
-    );
-
-    return Promise.all(stopPromises).then(() => undefined);
-  }
-
-  setResult(result: SymbolId[][]): void {
-    result.forEach((reelSymbols, reelIndex) => {
-      const reel = this._reels[reelIndex];
-
-      if (!reel) {
-        return;
-      }
-
-      reel.update(reelSymbols);
-    });
-  }
-
-  get slotWidth(): number {
-    return this._reelsContainer.width;
-  }
-
-  get slotHeight(): number {
-    return this._reelsContainer.height;
-  }
 }

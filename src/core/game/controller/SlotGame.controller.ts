@@ -6,7 +6,7 @@ import {
     Subscription,
 } from 'rxjs';
 
-import { SlotView } from '../../../ui/slot/SlotView';
+import { SlotMachineView } from '../../../ui/slot/SlotMachineView';
 import { SlotGame } from '../model/SlotGame';
 import { slotMachine } from '../../state-machine/slot-machine.state';
 import type { GameEvent } from '../../events/GameEvent';
@@ -20,14 +20,14 @@ export class SlotController {
     >;
 
     private readonly _game: SlotGame;
-    private readonly _slotView: SlotView;
+    private readonly _slotView: SlotMachineView;
     private readonly _winsView: WaysWinView;
     private readonly _spinButton: SpinButtonView;
     private readonly _eventSubscription: Subscription;
 
     constructor(
         game: SlotGame,
-        slotView: SlotView,
+        slotView: SlotMachineView,
         winsView: WaysWinView,
         spinButton: SpinButtonView,
         eventBus: GameEventBus,

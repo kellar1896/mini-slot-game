@@ -13,6 +13,10 @@ export class AssetManager {
         src: 'src/assets/slot/reels_base.png',
       },
       {
+        alias: 'reel-frame',
+        src: 'src/assets/slot/reel-frame.png',
+      },
+      {
         alias: 'M1',
         src: 'src/assets/symbols/high1.png',
       },
