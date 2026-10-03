@@ -13,7 +13,9 @@ describe(
     () => {
         it(
             'spins the game and updates the view when SPIN_REQUESTED is emitted',
-            () => {
+            async () => {
+                vi.useFakeTimers();
+
                 const result = {
                     reels: [
                         [1, 2, 3],
@@ -23,14 +25,25 @@ describe(
                         [1, 2, 4],
                     ],
                     win: 10,
+                    reelPositions: [0, 1, 2, 3, 4],
+                    wins: [],
                 };
 
                 const game = {
                     spin: vi.fn(() => result),
                 };
 
+                const slotMachine = {
+                    startSpin: vi.fn(),
+                    stop: vi.fn().mockResolvedValue(undefined),
+                };
+                const winsView = {
+                    resetOverlays: vi.fn(),
+                    iterateWins: vi.fn(),
+                };
                 const view = {
-                    setResult: vi.fn(),
+                    slotMachine,
+                    winsView,
                 };
                 const spinButton = {
                     setEnabled: vi.fn(() => {}),
@@ -51,23 +64,27 @@ describe(
                 eventBus.emit({
                     type: 'SPIN_REQUESTED',
                 });
+                await vi.advanceTimersByTimeAsync(2000);
 
                 expect(
                     game.spin,
                 ).toHaveBeenCalledTimes(1);
 
                 expect(
-                    view.setResult,
+                    winsView.resetOverlays,
                 ).toHaveBeenCalledTimes(1);
-
-                expect(
-                    view.setResult,
-                ).toHaveBeenCalledWith(
+                expect(slotMachine.startSpin).toHaveBeenCalledTimes(1);
+                expect(slotMachine.stop).toHaveBeenCalledWith(
                     result.reels,
+                    result.reelPositions,
                 );
+                expect(winsView.iterateWins).toHaveBeenCalledWith(result.wins);
+                expect(spinButton.setEnabled).toHaveBeenNthCalledWith(1, false);
+                expect(spinButton.setEnabled).toHaveBeenNthCalledWith(2, true);
 
                 controller.destroy();
                 eventBus.destroy();
+                vi.useRealTimers();
             },
         );
     },

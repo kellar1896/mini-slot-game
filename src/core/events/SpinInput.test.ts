@@ -3,10 +3,9 @@ import {
     expect,
     it,
 } from 'vitest';
+import { Container } from 'pixi.js';
 
-import {
-    SpinButtonView,
-} from '../../components';
+import type { SpinButtonView } from '../../components';
 
 import {
     GameEventBus,
@@ -23,7 +22,7 @@ describe(
             'emits SPIN_REQUESTED when the spin button emits spin',
             () => {
                 const button =
-                    new SpinButtonView();
+                    new Container() as unknown as SpinButtonView;
 
                 const eventBus =
                     new GameEventBus();
