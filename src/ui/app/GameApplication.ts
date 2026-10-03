@@ -12,6 +12,12 @@ import { SlotMachineView } from '../slot/SlotMachineView';
 import { SlotScaler } from '../slot/SlotScaler';
 import { SlotView } from '../slot/SlotView';
 
+const MIN_SLOT_SCALE = 0.6;
+const MAX_SLOT_SCALE = 1.2;
+const SLOT_SCALE_REFERENCE_WIDTH = 1400;
+const SPIN_BUTTON_SCALE_FACTOR = 0.5;
+const SPIN_BUTTON_BOTTOM_MARGIN = 10;
+
 export class GameApplication {
   private readonly app: Application;
   private backgroundView: BackgroundView | undefined;
@@ -19,6 +25,7 @@ export class GameApplication {
   private spinButton: SpinButtonView | undefined;
   private scaler: SlotScaler | undefined;
   private layout: SlotLayout | undefined;
+  private resizeObserver: ResizeObserver | undefined;
 
   constructor() {
     this.app = new Application();
@@ -59,9 +66,9 @@ export class GameApplication {
 
     const layout = new SlotLayout([slotView]);
     const scaler = new SlotScaler({
-      min: 0.6,
-      max: 1.2,
-      referenceWidth: 1400,
+      min: MIN_SLOT_SCALE,
+      max: MAX_SLOT_SCALE,
+      referenceWidth: SLOT_SCALE_REFERENCE_WIDTH,
     });
 
     this.backgroundView = backgroundView;
@@ -89,7 +96,10 @@ export class GameApplication {
     );
     container.appendChild(sandbox.element);
 
-    window.addEventListener('resize', this.updateLayout);
+    this.resizeObserver = new ResizeObserver(() => {
+      requestAnimationFrame(this.updateLayout);
+    });
+    this.resizeObserver.observe(container);
 
     (globalThis as typeof globalThis & {
       __PIXI_APP__: GameApplication;
@@ -111,7 +121,7 @@ export class GameApplication {
     const scale = scaler.calculate(this.app.screen.width);
 
     slotView.scale.set(scale);
-    spinButton.scale.set(scale * 0.5);
+    spinButton.scale.set(scale * SPIN_BUTTON_SCALE_FACTOR);
 
     layout.center(
       this.app.screen.width,
@@ -121,7 +131,7 @@ export class GameApplication {
     spinButton.x =
       (this.app.screen.width - spinButton.width) / 2;
     spinButton.y =
-      this.app.screen.height - spinButton.height - 10;
+      this.app.screen.height - spinButton.height - SPIN_BUTTON_BOTTOM_MARGIN;
   };
 
   get stage() {
