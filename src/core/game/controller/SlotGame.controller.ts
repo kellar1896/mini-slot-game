@@ -1,7 +1,3 @@
-import {
-    Subscription,
-} from 'rxjs';
-
 import { SlotGame } from '../model/SlotGame';
 import type { SpinButtonView } from '../../../components';
 import type { Slot, SlotView } from '../../../ui/slot';
@@ -12,7 +8,6 @@ export class SlotController {
     private readonly _game: SlotGame;
     private readonly _slotView: Slot;
     private readonly _spinButton: SpinButtonView;
-    private readonly _eventSubscription: Subscription | undefined;
 
     constructor(
         game: SlotGame,
@@ -22,8 +17,6 @@ export class SlotController {
         this._game = game;
         this._slotView = slotView;
         this._spinButton = spinButton;
-
-        console.log(this._eventSubscription);
     }
 
     startSpin(): void {
