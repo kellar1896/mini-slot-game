@@ -55,6 +55,7 @@ export class SlotController {
         await this._slotView.slotMachine.stop(result.reels, result.reelPositions);
         this._slotView.winsView.iterateWins(result.wins);
         this._slotView.winMeter.setAmount(result.win);
+        this._spinButton.setEnabled(true);
     }
 
     get game(): SlotGame {
