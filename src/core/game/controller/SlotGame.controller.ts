@@ -69,6 +69,7 @@ export class SlotController {
         });
 
         this._slotView.winsView.resetOverlays();
+        this._slotView.winMeter.reset();
         this._spinButton.setEnabled(false);
         this._slotView.slotMachine.startSpin();
 
@@ -82,6 +83,7 @@ export class SlotController {
 
         await this._slotView.slotMachine.stop(result.reels, result.reelPositions);
         this._slotView.winsView.iterateWins(result.wins);
+        this._slotView.winMeter.setAmount(result.win);
 
         this.actor.send({
             type: 'REELS_STOPPED',

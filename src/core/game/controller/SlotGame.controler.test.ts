@@ -41,9 +41,14 @@ describe(
                     resetOverlays: vi.fn(),
                     iterateWins: vi.fn(),
                 };
+                const winMeter = {
+                    reset: vi.fn(),
+                    setAmount: vi.fn(),
+                };
                 const view = {
                     slotMachine,
                     winsView,
+                    winMeter,
                 };
                 const spinButton = {
                     setEnabled: vi.fn(() => {}),
@@ -73,12 +78,14 @@ describe(
                 expect(
                     winsView.resetOverlays,
                 ).toHaveBeenCalledTimes(1);
+                expect(winMeter.reset).toHaveBeenCalledTimes(1);
                 expect(slotMachine.startSpin).toHaveBeenCalledTimes(1);
                 expect(slotMachine.stop).toHaveBeenCalledWith(
                     result.reels,
                     result.reelPositions,
                 );
                 expect(winsView.iterateWins).toHaveBeenCalledWith(result.wins);
+                expect(winMeter.setAmount).toHaveBeenCalledWith(result.win);
                 expect(spinButton.setEnabled).toHaveBeenNthCalledWith(1, false);
                 expect(spinButton.setEnabled).toHaveBeenNthCalledWith(2, true);
 

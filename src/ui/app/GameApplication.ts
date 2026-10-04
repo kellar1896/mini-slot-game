@@ -1,5 +1,5 @@
 import { Application } from 'pixi.js';
-import { AssetManager, SandboxView, SpinButtonView } from '../../components';
+import { AssetManager, SandboxView, SpinButtonView, WinMeterView } from '../../components';
 import { ReelFrameView } from '../../components/reels-frame/ReelFrameView';
 import { WaysWinView } from '../../components/ways-win/WaysWinView';
 import { slotConfig, symbolSize } from '../../core/config/slot.config';
@@ -53,11 +53,13 @@ export class GameApplication {
     );
     const spinButton = new SpinButtonView(assetManager);
     const waysWin = new WaysWinView(slotConfig);
+    const winMeter = new WinMeterView();
     const reelsFrame = new ReelFrameView(slotConfig, assetManager);
     const slotView = new SlotView(
       slotMachineView,
       waysWin,
       reelsFrame,
+      winMeter,
     );
 
     this.app.stage.addChild(backgroundView);
