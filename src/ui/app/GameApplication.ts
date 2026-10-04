@@ -131,6 +131,7 @@ export class GameApplication {
     this.actor?.stop();
     this.eventBus.destroy();
     this.resizeObserver?.disconnect();
+    this.app.destroy({ removeView: true });
   }
 
   updateLayout = (): void => {
