@@ -1,14 +1,25 @@
-import type { SlotConfig, SpinResult, SymbolId } from "../../../types/game";
+import type { SlotConfig, SpinResult, SymbolId, Wins } from "../../../types/game";
+import type { GameEventBus } from "../../events/GameEventBus";
 
 export class SlotGame {
   private readonly config: SlotConfig;
+  private readonly eventBus: GameEventBus;
+  private _spinResult: SpinResult | null = null;
 
-  constructor(config: SlotConfig) {
+  constructor(
+    config: SlotConfig,
+    eventBus: GameEventBus
+  ) {
     this.config = config;
+    this.eventBus = eventBus;
   }
 
   spin(): SpinResult {
     const result = this.generateResult();
+    this._spinResult = result;
+    this.eventBus.emit({
+      type: 'SPIN_RESPONSE',
+    });
     console.log("Spin Result:", result);
     return result;
   }
@@ -38,12 +49,17 @@ export class SlotGame {
     );
 
     const { win, wins } = this.evaluate(reels);
-    return {
+    this.eventBus.emit({
+      type: 'SPIN_RESPONSE',
+    });
+    const result: SpinResult = {
       reels,
       win,
       reelPositions: Array.from({ length: this.config.reels }, () => 0),
       wins,
-    };
+    }
+    this._spinResult = result;
+    return result;
   }
 
   private generateResult(): SpinResult {
@@ -73,10 +89,10 @@ export class SlotGame {
 
   private evaluate(reels: SymbolId[][]): {
     win: number;
-    wins: SpinResult["wins"];
-  } {
+    wins: Wins[];
+  } { 
     let win = 0;
-    const wins: SpinResult["wins"] = [];
+    const wins: Wins[] = [];
 
     for (const symbolConfig of this.config.symbols) {
       const matchingRowsByColumn: number[][] = [];
@@ -113,5 +129,9 @@ export class SlotGame {
     }
 
     return { win, wins };
+  }
+
+  get spinResult(): SpinResult | null {
+    return this._spinResult;
   }
 }

@@ -11,6 +11,9 @@ import { SlotLayout } from '../slot/SlotLayout';
 import { SlotMachineView } from '../slot/SlotMachineView';
 import { SlotScaler } from '../slot/SlotScaler';
 import { SlotView } from '../slot/SlotView';
+import { Subscription } from 'rxjs';
+import { createActor } from 'xstate';
+import { createSlotMachine } from '../../core/state-machine/slot-machine.state';
 
 const MIN_SLOT_SCALE = 0.6;
 const MAX_SLOT_SCALE = 1.2;
@@ -20,15 +23,30 @@ const SPIN_BUTTON_BOTTOM_MARGIN = 10;
 
 export class GameApplication {
   private readonly app: Application;
+  private actor: ReturnType<
+    typeof createActor
+  > | undefined;
   private backgroundView: BackgroundView | undefined;
   private slotView: SlotView | undefined;
   private spinButton: SpinButtonView | undefined;
   private scaler: SlotScaler | undefined;
   private layout: SlotLayout | undefined;
   private resizeObserver: ResizeObserver | undefined;
+  private eventBus: GameEventBus;
+  private readonly _eventSubscription: Subscription;
 
   constructor() {
     this.app = new Application();
+    this.eventBus = new GameEventBus();
+
+    this._eventSubscription =
+      this.eventBus.events$
+        .subscribe((event) => {
+          console.log('Event received in GameApplication:', event);
+          if (this.actor) {
+            this.actor.send(event);
+          }
+        });
   }
 
   async init(container: HTMLElement): Promise<void> {
@@ -43,7 +61,7 @@ export class GameApplication {
     const assetManager = new AssetManager();
     await assetManager.load();
 
-    const game = new SlotGame(slotConfig);
+    const game = new SlotGame(slotConfig, this.eventBus);
     const backgroundView = new BackgroundView(assetManager);
     const slotMachineView = new SlotMachineView(
       slotConfig,
@@ -81,14 +99,13 @@ export class GameApplication {
 
     this.updateLayout();
 
-    const eventBus = new GameEventBus();
-    new SpinInput(spinButton, eventBus);
+    new SpinInput(spinButton, this.eventBus);
 
     const controller = new SlotController(
       game,
       slotView,
       spinButton,
-      eventBus,
+      this.eventBus,
     );
 
     const sandbox = new SandboxView(
@@ -97,6 +114,8 @@ export class GameApplication {
       (symbols) => controller.spin(symbols),
     );
     container.appendChild(sandbox.element);
+    this.actor = createActor(createSlotMachine(controller));
+    this.actor.start();
 
     this.resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(this.updateLayout);
@@ -106,6 +125,13 @@ export class GameApplication {
     (globalThis as typeof globalThis & {
       __PIXI_APP__: GameApplication;
     }).__PIXI_APP__ = this;
+  }
+
+  destroy(): void {
+    this._eventSubscription.unsubscribe();
+    this.actor?.stop();
+    this.eventBus.destroy();
+    this.resizeObserver?.disconnect();
   }
 
   updateLayout = (): void => {
