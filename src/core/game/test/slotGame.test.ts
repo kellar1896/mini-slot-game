@@ -1,10 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { slotConfig } from '../../config/slot.config';
+import { GameEventBus } from '../../events/GameEventBus';
 import { SlotGame } from '../model/SlotGame';
+
+const createGame = (config = slotConfig) =>
+  new SlotGame(config, new GameEventBus());
 
 describe('SlotGame', () => {
   it('generates the correct number of reels', () => {
-    const game = new SlotGame(slotConfig);
+    const game = createGame();
 
     const result = game.spin();
 
@@ -12,7 +16,7 @@ describe('SlotGame', () => {
   });
 
   it('generates the correct number of rows', () => {
-    const game = new SlotGame(slotConfig);
+    const game = createGame();
 
     const result = game.spin();
 
@@ -22,7 +26,7 @@ describe('SlotGame', () => {
   });
 
   it('generates valid symbols', () => {
-    const game = new SlotGame(slotConfig);
+    const game = createGame();
 
     const result = game.spin();
 
@@ -36,7 +40,7 @@ describe('SlotGame', () => {
   });
 
   it('forces wins for each selected symbol across every reel', () => {
-    const game = new SlotGame(slotConfig);
+    const game = createGame();
 
     const result = game.spinWithSymbols(['M1', 'M2']);
 
@@ -47,7 +51,7 @@ describe('SlotGame', () => {
   });
 
   it('pays each way of 3+ matching symbols across consecutive reels', () => {
-    const game = new SlotGame({
+    const game = createGame({
       ...slotConfig,
       rows: 3,
       reels: 3,
@@ -77,7 +81,7 @@ describe('SlotGame', () => {
   });
 
   it('returns one win per symbol and sums them into the total win', () => {
-    const game = new SlotGame({
+    const game = createGame({
       ...slotConfig,
       rows: 3,
       reels: 3,
@@ -121,7 +125,7 @@ describe('SlotGame', () => {
   });
 
   it('does not pay matching symbols separated by a non-matching reel', () => {
-    const game = new SlotGame({
+    const game = createGame({
       ...slotConfig,
       rows: 3,
       reels: 4,
