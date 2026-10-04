@@ -105,7 +105,6 @@ export class GameApplication {
       game,
       slotView,
       spinButton,
-      this.eventBus,
     );
 
     const sandbox = new SandboxView(

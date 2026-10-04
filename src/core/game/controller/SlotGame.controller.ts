@@ -1,23 +1,13 @@
 import {
-    createActor,
-} from 'xstate';
-import {
-    filter,
     Subscription,
 } from 'rxjs';
 
 import { SlotGame } from '../model/SlotGame';
-// import { slotMachine } from '../../state-machine/slot-machine.state';
-import type { GameEvent } from '../../events/GameEvent';
-import type { GameEventBus } from '../../events/GameEventBus';
 import type { SpinButtonView } from '../../../components';
 import type { Slot, SlotView } from '../../../ui/slot';
 import type { SymbolId } from '../../../types/game';
 
 export class SlotController {
-    // private readonly actor: ReturnType<
-    //     typeof createActor
-    // >;
 
     private readonly _game: SlotGame;
     private readonly _slotView: Slot;
@@ -28,33 +18,12 @@ export class SlotController {
         game: SlotGame,
         slotView: SlotView,
         spinButton: SpinButtonView,
-        eventBus: GameEventBus,
     ) {
         this._game = game;
         this._slotView = slotView;
         this._spinButton = spinButton;
 
-        // this.actor = createActor(
-        //     slotMachine,
-        // );
-
-        // this.actor.start();
         console.log(this._eventSubscription);
-
-        // this._eventSubscription =
-        //     eventBus.events$
-        //         .pipe(
-        //             filter(
-        //                 (
-        //                     event: GameEvent,
-        //                 ) =>
-        //                     event.type ===
-        //                     'SPIN_REQUESTED',
-        //             ),
-        //         )
-        //         .subscribe(() => {
-        //             this.spin();
-        //         });
     }
 
     startSpin(): void {
@@ -86,11 +55,6 @@ export class SlotController {
         this._slotView.winMeter.reset();
         this._spinButton.setEnabled(false);
         this._slotView.slotMachine.startSpin();
-
-        await new Promise((resolve) =>
-            setTimeout(resolve, 2000),
-        );
-
         const result = forcedSymbols?.length
             ? this._game.spinWithSymbols(forcedSymbols)
             : this._game.spin();

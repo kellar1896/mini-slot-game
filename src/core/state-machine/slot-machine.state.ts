@@ -12,6 +12,7 @@ export const createSlotMachine = (controller: SlotController) =>
         controller.startSpin();
       },
       displayWin: () => {
+        console.log('Displaying win...');
         const result = controller.game.spinResult;
         if (!result) {
           console.warn('No spin result available to display wins.');
