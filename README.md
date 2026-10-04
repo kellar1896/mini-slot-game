@@ -90,39 +90,26 @@ The current implementation includes:
 The application is divided into several layers.
 
 ```text
-┌───────────────────────────────────────────────┐
-│                    UI / Input                 │
-│                                               │
-│   SpinButton      Sandbox      Pixi Views     │
-└───────────────────────┬───────────────────────┘
-                        │
-                        ▼
-              ┌───────────────────┐
-              │   RxJS Event Bus  │
-              └─────────┬─────────┘
-                        │
-                        ▼
-              ┌───────────────────┐
-              │  SlotController   │
-              │  Orchestration    │
-              └───────┬─────┬─────┘
-                      │     │
-             ┌────────┘     └─────────┐
-             ▼                        ▼
-      ┌──────────────┐        ┌──────────────┐
-      │   SlotGame   │        │    XState    │
-      │ Domain Logic │        │ State Machine│
-      └───────┬──────┘        └──────────────┘
-              │
-              │ SpinResult
-              ▼
-      ┌──────────────────┐
-      │    SlotView      │
-      └────────┬─────────┘
-               │
-       ┌───────┼────────┐
-       ▼       ▼        ▼
-    Reels     Wins     Frame
+SpinButtonView ──"spin"──► SpinInput ──SPIN_REQUESTED──► GameEventBus
+                                                   │
+                                                   ▼
+                                            GameApplication
+                                            forwards event
+                                                   │
+                                                   ▼
+                                              XState actor
+                                                   │ invokes
+                                                   ▼
+                                              SlotController
+                                              /           \
+                                             ▼             ▼
+                                        SlotGame       SlotView / Pixi
+                                      result + wins   reels, wins, UI
+                                          │
+                                          └──SPIN_RESPONSE──► GameEventBus
+
+SandboxView ──forced symbols──► SlotController.spinDEBUG()
+                            (direct path; bypasses XState)
 ```
 
 The main principle is:
@@ -146,7 +133,8 @@ src/
 │   ├── reels-frame/
 │   ├── sandbox/
 │   ├── spin-button/
-│   └── ways-win/
+│   ├── ways-win/
+│   └── win-meter/
 │
 ├── core/
 │   ├── config/
@@ -303,48 +291,20 @@ This is important because a real slot game should not assume that every reel has
 A spin follows this general lifecycle:
 
 ```text
-                 ┌─────────────┐
-                 │    IDLE     │
-                 └──────┬──────┘
-                        │
-                  SPIN_REQUEST
-                        │
-                        ▼
-                 ┌─────────────┐
-                 │   SPINNING  │
-                 └──────┬──────┘
-                        │
-                  REELS_STOPPED
-                        │
-                        ▼
-                 ┌─────────────┐
-                 │  EVALUATING │
-                 └──────┬──────┘
-                     ┌──┴──┐
-                     │     │
-              WIN_DETECTED NO_WIN
-                     │     │
-                     ▼     ▼
-                  ┌────┐  IDLE
-                  │ WIN│
-                  └─┬──┘
-                    │
-              WIN_COMPLETED
-                    │
-                    ▼
-                   IDLE
+SpinInput emits SPIN_REQUESTED
+                 │
+                 ▼
+GameApplication forwards event to XState actor
+                 │
+                 ▼
+idle ──► spinning ──► stopReels ──► win ──► idle
+           │               │          │
+           │               │          └─ show cached result
+           │               └─ await reel-stop Promise
+           └─ start animation; wait a randomized delay
 ```
 
-The controller coordinates this process.
-
-The important distinction is that the state machine does not perform rendering itself.
-
-Instead:
-
-- **XState** represents the current lifecycle.
-- **SlotController** coordinates the lifecycle.
-- **SlotGame** generates and evaluates the game result.
-- **SlotView** translates the result into visual behaviour.
+The state machine owns the lifecycle transitions, while the controller exposes operations the machine invokes. The game model calculates the result, and Pixi views animate and present it. The machine enters `win` after the reel-stop Promise resolves; it then reads the result cached by `SlotGame` and returns to `idle`.
 
 ---
 
@@ -479,37 +439,16 @@ The stop uses easing so that the reel decelerates instead of simply stopping at 
 
 # State Management
 
-XState is used to model the game lifecycle.
-
-The current state machine contains:
+XState 5 runs the slot lifecycle as an actor created in `GameApplication`. The current machine contains four states:
 
 ```text
-idle
-  ↓
-spinning
-  ↓
-evaluating
-  ├── win
-  │    ↓
-  │   idle
-  │
-  └── no win
-       ↓
-      idle
+idle --SPIN_REQUESTED--> spinning
+spinning --random delay--> stopReels
+stopReels --stop Promise resolves--> win
+win --immediate transition--> idle
 ```
 
-This avoids managing the lifecycle through a collection of independent booleans.
-
-For example, instead of having:
-
-```ts
-isSpinning
-isStopping
-isEvaluating
-hasWin
-```
-
-the application has a clearly defined lifecycle.
+On entry to `spinning`, the machine disables the spin button, clears old win presentation, and starts reel animation through the controller. After a randomized delay, it invokes the controller's reel-stop operation. When that Promise resolves, the `win` state presents the result from `SlotGame.spinResult`, then transitions immediately back to `idle`, where the spin button is enabled again. Win/no-win is not a separate branch in the current machine.
 
 ---
 
@@ -517,31 +456,26 @@ the application has a clearly defined lifecycle.
 
 `SlotController` is the orchestration layer.
 
-It coordinates:
+It provides operations used by the state machine to coordinate:
 
-- User input
-- XState
-- Game logic
+- Starting the visual spin
+- Asking `SlotGame` to generate or force a result
 - Reel animation
 - Win presentation
 - Spin button state
 
-The controller does not implement the game mathematics itself.
-
-Instead:
+The controller neither subscribes to the event bus nor owns state transitions. It does not implement the game mathematics; `SlotGame` evaluates results. The XState machine chooses when controller operations run.
 
 ```text
-SlotController
-      │
-      ├── XState
-      │
-      ├── SlotGame
-      │
-      ├── SlotMachineView
-      │
-      ├── WaysWinView
-      │
-      └── SpinButtonView
+GameApplication ── creates/connects ──► XState actor
+                                                   │
+                                                   ▼
+                                            SlotController
+                                            ├── SlotGame
+                                            ├── SlotMachineView
+                                            ├── WaysWinView
+                                            ├── WinMeterView
+                                            └── SpinButtonView
 ```
 
 This keeps orchestration separate from both the domain and rendering implementations.
@@ -550,9 +484,7 @@ This keeps orchestration separate from both the domain and rendering implementat
 
 # Event-Driven Input
 
-The spin button does not directly call `SlotController.spin()`.
-
-Instead, input is translated into an application event.
+The spin button does not call the controller directly. Instead, its `spin` event is translated into an application event.
 
 ```text
 SpinButtonView
@@ -566,16 +498,13 @@ GameEventBus
       │
       │ SPIN_REQUESTED
       ▼
-SlotController
+GameApplication event subscription
+        │
+        ▼
+XState actor
 ```
 
-The event bus is implemented using RxJS.
-
-The controller subscribes only to the events it needs.
-
-This provides a decoupling layer between UI input and game orchestration.
-
-It also makes it possible to introduce other input sources later without changing the controller's external contract.
+The RxJS-based event bus is shared by `SpinInput`, `GameApplication`, and `SlotGame`. `SpinInput` translates the button's `spin` event to `SPIN_REQUESTED`. `GameApplication` subscribes to the bus and forwards events to the actor. `SlotGame` emits `SPIN_RESPONSE` when it creates a result; the current state machine does not use that event to drive a transition. This keeps the input component independent of the game lifecycle and controller.
 
 ---
 
@@ -646,13 +575,13 @@ The sandbox solves that problem.
 
 The developer can select symbols and trigger a deterministic spin.
 
-The selected symbols are passed to:
+The selected symbols are passed to the controller's debug method:
 
 ```ts
-controller.spin(symbols)
+controller.spinDEBUG(symbols)
 ```
 
-The game model then creates a deterministic result containing those symbols across the reels.
+This path clears the current presentation, starts the reels, asks `SlotGame.spinWithSymbols()` for a deterministic result, stops the reels, and displays the wins directly. It bypasses the normal XState lifecycle so specific visual outcomes can be tested on demand.
 
 This makes it possible to repeatedly test:
 
@@ -718,11 +647,9 @@ GameApplication
 ├── GameEventBus
 ├── SpinInput
 ├── SlotController
+├── XState actor
 └── SandboxView
 ```
-
-This makes the application's dependencies explicit in one place.
-
 The application entry point therefore remains intentionally small.
 
 ---

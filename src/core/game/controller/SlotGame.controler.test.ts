@@ -5,17 +5,14 @@ import {
     vi,
 } from 'vitest';
 
-import { GameEventBus } from '../../events/GameEventBus';
 import { SlotController } from './SlotGame.controller';
 
 describe(
     'SlotController',
     () => {
         it(
-            'spins the game and updates the view when SPIN_REQUESTED is emitted',
+            'starts and stops a spin, then displays its wins',
             async () => {
-                vi.useFakeTimers();
-
                 const result = {
                     reels: [
                         [1, 2, 3],
@@ -54,22 +51,17 @@ describe(
                     setEnabled: vi.fn(() => {}),
                 };
 
-                const eventBus =
-                    new GameEventBus();
-
-
                 const controller =
                     new SlotController(
                         game as any,
                         view as any,
                         spinButton as any,
-                        eventBus,
                     );
 
-                eventBus.emit({
-                    type: 'SPIN_REQUESTED',
-                });
-                await vi.advanceTimersByTimeAsync(2000);
+                controller.startSpin();
+                const stopPromise = controller.stopReels();
+                controller.showWins(result);
+                await stopPromise;
 
                 expect(
                     game.spin,
@@ -88,10 +80,6 @@ describe(
                 expect(winMeter.setAmount).toHaveBeenCalledWith(result.win);
                 expect(spinButton.setEnabled).toHaveBeenNthCalledWith(1, false);
                 expect(spinButton.setEnabled).toHaveBeenNthCalledWith(2, true);
-
-                controller.destroy();
-                eventBus.destroy();
-                vi.useRealTimers();
             },
         );
     },
