@@ -110,7 +110,7 @@ export class GameApplication {
     const sandbox = new SandboxView(
       slotConfig.symbols,
       slotConfig.rows,
-      (symbols) => controller.spin(symbols),
+      (symbols) => controller.spinDEBUG(symbols),
     );
     container.appendChild(sandbox.element);
     this.actor = createActor(createSlotMachine(controller));

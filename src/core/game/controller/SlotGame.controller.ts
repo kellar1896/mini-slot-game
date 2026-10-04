@@ -50,7 +50,7 @@ export class SlotController {
         this._spinButton.setEnabled(enabled);
     }
 
-    async spin(forcedSymbols?: SymbolId[]): Promise<void> {
+    async spinDEBUG(forcedSymbols?: SymbolId[]): Promise<void> {
         this._slotView.winsView.resetOverlays();
         this._slotView.winMeter.reset();
         this._spinButton.setEnabled(false);
