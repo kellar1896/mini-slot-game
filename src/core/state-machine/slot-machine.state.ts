@@ -12,7 +12,6 @@ export const createSlotMachine = (controller: SlotController) =>
         controller.startSpin();
       },
       displayWin: () => {
-        console.log('Displaying win...');
         const result = controller.game.spinResult;
         if (!result) {
           console.warn('No spin result available to display wins.');
@@ -21,15 +20,11 @@ export const createSlotMachine = (controller: SlotController) =>
         controller.showWins(result);
       },
       enableSpinButton: () => {
-        console.log('Enabling spin button...');
         controller.setEnableSpinButton(true);
       }
     },
     actors: {
-      stopMachine: fromPromise(() => {
-        console.log('Invoking stopMachine actor...');
-        return controller.stopReels();
-      }),
+      stopMachine: fromPromise(() => controller.stopReels()),
     },
     delays: {
       randomResponseDelay: () => Math.floor(Math.random() * 1000) + 100,
@@ -71,10 +66,12 @@ export const createSlotMachine = (controller: SlotController) =>
       },
 
       win: {
-        actions: [
+        entry: [
           'displayWin',
         ],
-        target: 'idle',
+        always: {
+          target: 'idle',
+        },
       },
     },
   });
