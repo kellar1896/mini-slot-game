@@ -10,7 +10,7 @@ The project is intentionally small, but the architecture is designed around conc
 
 ## Demo
 
-> Add a screenshot or GIF of the finished game here.
+![Mini Slot Engine gameplay](public/demo.gif)
 
 The current implementation includes:
 
